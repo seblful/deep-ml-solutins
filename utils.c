@@ -1,6 +1,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+void printVector(int *v, int n)
+{
+    for (int i = 0; i < n; i++)
+    {
+        printf("%d ", v[i]);
+    }
+};
+
 void printMatrix(int **m, int rows, int cols)
 {
     for (int i = 0; i < rows; i++)

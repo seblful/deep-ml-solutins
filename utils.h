@@ -5,5 +5,6 @@
 #include <stdlib.h>
 
 void printMatrix(int **m, int rows, int cols);
+void printVector(int *v, int n);
 
 #endif
