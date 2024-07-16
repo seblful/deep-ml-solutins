@@ -26,23 +26,38 @@ int *matrixVectorMul(int **m, int *v, int rows, int cols, int n)
 int main()
 {
     // Declaration of rows, cols of matrix and size of vector
-    int rows, cols, n;
+    int rows = 2, cols = 2, n = 2;
 
     // Init matrix
-    int m1[2][2] = {{1, 2}, {2, 4}};
-    rows = sizeof(m1) / sizeof(m1[0]);
-    cols = sizeof(m1[0]) / sizeof(m1[0][0]);
+    int **m1 = (int **)malloc(rows * sizeof(int *));
+    for (int i = 0; i < cols; i++)
+    {
+        m1[i] = (int *)malloc(cols * sizeof(int));
+    };
+
+    // Fill matrix
+    m1[0][0] = 1;
+    m1[0][1] = 2;
+    m1[1][0] = 2;
+    m1[1][1] = 4;
+
     printf("Matrix with %d rows and %d cols.\n", rows, cols);
+    printMatrix(m1, rows, cols);
 
     // Init vector
-    int v1[2] = {1, 2};
-    n = sizeof(v1) / sizeof(v1[0]);
+    int *v1 = (int *)malloc(n * sizeof(int));
+
+    // Fill vector
+    v1[0] = 1;
+    v1[1] = 2;
     printf("Vector with size %d.\n", n);
+    printVector(v1, n);
 
     // Matrix vector multiplication
-    // Init matrix
+    // Init result matrix
     int *result;
-    result = matrixVectorMul(**m1, *v1, rows, cols, n);
+    result = matrixVectorMul(m1, v1, rows, cols, n);
+    printf("Matrix vector multiplication result is:\n");
     printVector(result, rows);
 
     return 0;
