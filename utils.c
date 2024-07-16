@@ -7,6 +7,7 @@ void printVector(int *v, int n)
     {
         printf("%d ", v[i]);
     }
+    printf("\n");
 };
 
 void printMatrix(int **m, int rows, int cols)
