@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void printMatrix(int **m, int rows, int cols);
-void printVector(int *v, int n);
+void printMatrix(double **m, int rows, int cols, int precision);
+void printVector(double *v, int n, int precision);
 
 #endif
