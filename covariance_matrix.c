@@ -3,6 +3,20 @@
 
 #include "utils.h"
 
+double calculateMean(double *v, int size)
+{
+    // Declare sum
+    double sum = 0;
+
+    // Iterating through vector and calculate mean
+    for (int i = 0; i < size; i++)
+    {
+        sum += v[i];
+    }
+
+    return sum / size;
+};
+
 double **createCovarianceMatrix(int f, int r)
 {
     // Init result matrix
@@ -11,6 +25,14 @@ double **createCovarianceMatrix(int f, int r)
     {
         result[i] = (double *)calloc(sizeof(double), f);
     };
+
+    // Fill matrix
+    for (int i = 0; i < f; i++)
+    {
+        for (int j = 0; j < r; j++)
+        {
+        }
+    }
 };
 
 int main()
@@ -37,7 +59,7 @@ int main()
     double **result;
 
     // Create covariance matrix from vectors
-    result = createCovarianceMatrix();
+    result = createCovarianceMatrix(f, r);
     printMatrix(result, f, f);
 
     return 0;
