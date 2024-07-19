@@ -5,27 +5,34 @@
 
 double *calculateJacobi(double **A, double *b, double *x, int rows, int cols, int n)
 {
-    double sigma;
+    // Temporary array for new values
+    double *x_new = malloc(sizeof(double) * rows);
 
-    for (int r = 0; r < n; r++)
+    for (int iter = 0; iter < n; iter++)
     {
         for (int i = 0; i < rows; i++)
         {
-            sigma = 0;
-            for (int j = 0; j < cols; j++)
+            double sigma = 0;
+            for (int j = 0; j < rows; j++)
             {
                 if (j != i)
                 {
                     sigma += A[i][j] * x[j];
-                };
-            };
-            x[i] = (1 / A[i][i]) * (b[i] - sigma);
-        };
-    };
+                }
+            }
+            x_new[i] = (1.0 / A[i][i]) * (b[i] - sigma);
+        }
 
+        // Update x with new values
+        for (int i = 0; i < rows; i++)
+        {
+            x[i] = x_new[i];
+        }
+    }
+    // Free the temporary array
+    free(x_new);
     return x;
-};
-
+}
 int main()
 {
     // Declaration number of linear equations, number of unknown variables
@@ -80,9 +87,10 @@ int main()
 
     // Iterate with Jacobi method
     x = calculateJacobi(A, b, x, rows, cols, 2);
+
     // Print result vector x
     printf("Vector with size %d.\n", rows);
-    printVector(x, rows, 2);
+    printVector(x, rows, 4);
 
     // Free allocated memory
     for (int i = 0; i < rows; i++)
