@@ -3,6 +3,29 @@
 
 #include "utils.h"
 
+double *calculateJacobi(double **A, double *b, double *x, int rows, int cols, int n)
+{
+    double sigma;
+
+    for (int r = 0; r < n; r++)
+    {
+        for (int i = 0; i < rows; i++)
+        {
+            sigma = 0;
+            for (int j = 0; j < cols; j++)
+            {
+                if (j != i)
+                {
+                    sigma += A[i][j] * x[j];
+                };
+            };
+            x[i] = (1 / A[i][i]) * (b[i] - sigma);
+        };
+    };
+
+    return x;
+};
+
 int main()
 {
     // Declaration number of linear equations, number of unknown variables
@@ -26,13 +49,13 @@ int main()
 
     A[2][0] = 2;
     A[2][1] = -1;
-    A[2][2] = 7;
+    A[2][2] = -7;
 
     // Print matrix
     printf("Matrix with %d rows and %d cols.\n", rows, cols);
     printMatrix(A, rows, cols, 2);
 
-    // Init vector
+    // Init b vector
     double *b = malloc(sizeof(double) * rows);
 
     // Fill vector
@@ -40,9 +63,35 @@ int main()
     b[1] = 2;
     b[2] = 3;
 
-    // Print vector
+    // Print vector b
     printf("Vector with size %d.\n", rows);
     printVector(b, rows, 2);
+
+    // Init x vector
+    double *x = malloc(sizeof(double) * rows);
+    // Fill vector
+    x[0] = 0;
+    x[1] = 0;
+    x[2] = 0;
+
+    // Print vector x
+    printf("Vector with size %d.\n", rows);
+    printVector(x, rows, 2);
+
+    // Iterate with Jacobi method
+    x = calculateJacobi(A, b, x, rows, cols, 2);
+    // Print result vector x
+    printf("Vector with size %d.\n", rows);
+    printVector(x, rows, 2);
+
+    // Free allocated memory
+    for (int i = 0; i < rows; i++)
+    {
+        free(A[i]);
+    }
+    free(A);
+    free(b);
+    free(x);
 
     return 0;
 };
