@@ -12,6 +12,21 @@ typedef struct
     double **V;
 } DecompositionItem;
 
+void calculateSingularValues(double **A_prime, int rows, int cols, double *E)
+{
+    // Calculate singular values
+    for (int i = 0; i < rows; i++)
+    {
+        for (int j = 0; j < cols; j++)
+        {
+            if (i == j)
+            {
+                E[i] = sqrt(A_prime[i][j]);
+            }
+        }
+    };
+};
+
 DecompositionItem decomposeMatrix(double **A, int rows, int cols)
 {
     // Declaration and initialization of matrices
@@ -23,11 +38,14 @@ DecompositionItem decomposeMatrix(double **A, int rows, int cols)
     A_temp = allocateMatrix(cols, rows);
     A_prime = allocateMatrix(cols, cols);
 
-    // Declaration of vector
-    double *E;
+    // Declaration and initialization of vector
+    double *E = (double *)malloc(sizeof(double) * cols);
 
     // Declaration of numbers
     double theta;
+
+    // Declaration of structs
+    DecompositionItem item;
 
     // Transpose matrix
     A_T = transposeMatrix(A, rows, cols);
@@ -62,7 +80,19 @@ DecompositionItem decomposeMatrix(double **A, int rows, int cols)
     printf("Matrix A_prime with %d rows and %d cols.\n", cols, cols);
     printMatrix(A_prime, cols, cols, 2);
 
-    return;
+    // Calculate singular values
+    calculateSingularValues(A_prime, cols, cols, E);
+
+    // Print singular values
+    printf("Singular values: vector with size %d.\n", cols);
+    printVector(E, cols, 3);
+
+    // Write values to struct
+    item.U = J;
+    item.E = E;
+    item.V = J_T;
+
+    return item;
 };
 
 int main()
@@ -90,6 +120,16 @@ int main()
 
     // SVD
     result = decomposeMatrix(A, rows, cols);
+
+    // Print result
+    printf("Matrix U with %d rows and %d cols.\n", rows, cols);
+    printMatrix(result.U, rows, cols, 3);
+
+    printf("Vector E with size %d.\n", cols);
+    printVector(result.E, cols, 3);
+
+    printf("Matrix V with %d rows and %d cols.\n", cols, rows);
+    printMatrix(result.V, cols, rows, 3);
 
     return 0;
 };
