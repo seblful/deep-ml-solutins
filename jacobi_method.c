@@ -33,6 +33,7 @@ double *calculateJacobi(double **A, double *b, double *x, int rows, int cols, in
     free(x_new);
     return x;
 }
+
 int main()
 {
     // Declaration number of linear equations, number of unknown variables
