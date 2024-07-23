@@ -8,9 +8,9 @@ void printMatrix(double **m, int rows, int cols, int precision);
 void printVector(double *v, int n, int precision);
 
 double **allocateMatrix(int rows, int cols);
-void freeMatrix(int **matrix, int rows);
+void freeMatrix(double **matrix, int rows);
 
-void matrixMultiply(int **A, int rowsA, int colsA, int **B, int rowsB, int colsB, int **C);
-double **transposeMatrix(int **matrix, int rows, int cols);
+void matrixMultiply(double **A, int rowsA, int colsA, double **B, int rowsB, int colsB, double **C);
+double **transposeMatrix(double **matrix, int rows, int cols);
 
 #endif
