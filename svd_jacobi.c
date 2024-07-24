@@ -92,6 +92,12 @@ DecompositionItem decomposeMatrix(double **A, int rows, int cols)
     item.E = E;
     item.V = J_T;
 
+    // Free memory
+    freeMatrix(A_T, cols);
+    freeMatrix(A_T_A, rows);
+    freeMatrix(A_temp, cols);
+    freeMatrix(A_prime, cols);
+
     return item;
 };
 
@@ -130,6 +136,11 @@ int main()
 
     printf("Matrix V with %d rows and %d cols.\n", cols, rows);
     printMatrix(result.V, cols, rows, 3);
+
+    // Free memory
+    freeMatrix(result.U, rows);
+    free(result.E);
+    freeMatrix(result.V, cols);
 
     return 0;
 };
