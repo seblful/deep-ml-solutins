@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <assert.h>
 
 void printVector(double *v, int n, int precision)
 {
@@ -21,6 +22,23 @@ void printMatrix(double **m, int rows, int cols, int precision)
         printf("\n");
     }
     return;
+};
+
+double *matrixVectorMultiply(double **M, int rows, int cols, double *v, int n, double *result)
+{
+    // Assert if wrong size of matrix or vector
+    assert(cols == n); // Vector size n should be the same as number of matrix cols."
+
+    // Perform multiplication
+    for (int i = 0; i < rows; i++)
+    {
+        for (int j = 0; j < cols; j++)
+        {
+            // Write code
+            result[i] += M[i][j] * v[j];
+        }
+    }
+    return result;
 };
 
 void matrixMultiply(double **A, int rowsA, int colsA, double **B, int rowsB, int colsB, double **C)
