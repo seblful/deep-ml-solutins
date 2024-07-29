@@ -4,25 +4,45 @@
 #include "utils.h"
 
 // Function to invert 2x2 matrix
-double invert_matrix(double **matrix, double **result)
+double invertMatrix(double **matrix, double **result)
 {
     // Check if matrix is not singular
     double determinant = matrix[0][0] * matrix[1][1] - matrix[0][1] * matrix[1][0];
     if (determinant == 0)
+        return 0; // Singular matrix
 
-        // Invert matrix
-        result[0][0] = matrix[1][1] / determinant;
+    // Invert matrix
+    result[0][0] = matrix[1][1] / determinant;
     result[0][1] = -matrix[0][1] / determinant;
     result[1][0] = -matrix[1][0] / determinant;
     result[1][1] = matrix[0][0] / determinant;
     return 1; // Inversion successful
 }
 
-double *calculateTheta(double **X, double *y, double *theta, int rows, int cols)
+double *calculateTheta(double **X, int rows, int cols, double *y)
 {
     // Create temp matrices
-    double **T1 = allocateMatrix(rows, rows);
-    return;
+    double **T1 = allocateMatrix(cols, cols);
+    double **IM = allocateMatrix(cols, cols);
+    double **T2 = allocateMatrix(cols, rows);
+
+    // Create temp vector
+    double *theta = (double *)malloc(sizeof(double) * cols);
+
+    // Transpose matrix
+    double **X_T = transposeMatrix(X, rows, cols);
+
+    // Multiply and inverse matrix
+    matrixMultiply(X_T, cols, rows, X, rows, cols, T1);
+    invertMatrix(T1, IM);
+    printf("Matrix IM with %d rows and %d cols.\n", cols, cols);
+    printMatrix(IM, cols, cols, 4);
+
+    // Multiply inverse matrix on X_T and y
+    matrixMultiply(IM, cols, cols, X_T, cols, rows, T2);
+    matrixVectorMultiply(T2, cols, rows, y, rows, theta);
+
+    return theta;
 };
 
 int main()
@@ -47,7 +67,7 @@ int main()
 
     // Init y and result
     double *y = (double *)malloc(sizeof(double) * rows);
-    double *theta = (double *)malloc(sizeof(double) * cols);
+    double *theta;
 
     // Fill y
     y[0] = 1;
@@ -59,7 +79,9 @@ int main()
     printVector(y, cols, 0);
 
     // Calculate theta
-    theta = calculateTheta(X, y, theta, rows, cols);
+    theta = calculateTheta(X, rows, cols, y);
+    printf("Vector theta with size %d.\n", cols);
+    printVector(theta, cols, 4);
 
     // Free memory
 
