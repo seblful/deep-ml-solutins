@@ -3,7 +3,27 @@
 
 #include "utils.h"
 
-double *calculateTheta(double **X, double *y, double *theta) { return; };
+// Function to invert 2x2 matrix
+double invert_matrix(double **matrix, double **result)
+{
+    // Check if matrix is not singular
+    double determinant = matrix[0][0] * matrix[1][1] - matrix[0][1] * matrix[1][0];
+    if (determinant == 0)
+
+        // Invert matrix
+        result[0][0] = matrix[1][1] / determinant;
+    result[0][1] = -matrix[0][1] / determinant;
+    result[1][0] = -matrix[1][0] / determinant;
+    result[1][1] = matrix[0][0] / determinant;
+    return 1; // Inversion successful
+}
+
+double *calculateTheta(double **X, double *y, double *theta, int rows, int cols)
+{
+    // Create temp matrices
+    double **T1 = allocateMatrix(rows, rows);
+    return;
+};
 
 int main()
 {
@@ -39,7 +59,9 @@ int main()
     printVector(y, cols, 0);
 
     // Calculate theta
-    theta = calculateTheta(X, y, theta);
+    theta = calculateTheta(X, y, theta, rows, cols);
+
+    // Free memory
 
     return 0;
 }
