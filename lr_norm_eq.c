@@ -42,6 +42,12 @@ double *calculateTheta(double **X, int rows, int cols, double *y)
     matrixMultiply(IM, cols, cols, X_T, cols, rows, T2);
     matrixVectorMultiply(T2, cols, rows, y, rows, theta);
 
+    // Free memory
+    freeMatrix(T1, cols);
+    freeMatrix(IM, cols);
+    freeMatrix(T2, cols);
+    freeMatrix(X_T, cols);
+
     return theta;
 };
 
@@ -84,6 +90,9 @@ int main()
     printVector(theta, cols, 4);
 
     // Free memory
+    freeMatrix(X, rows);
+    free(y);
+    free(theta);
 
     return 0;
 }
