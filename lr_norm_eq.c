@@ -82,7 +82,7 @@ int main()
 
     // Print y
     printf("Vector y with size %d.\n", rows);
-    printVector(y, cols, 0);
+    printVector(y, rows, 0);
 
     // Calculate theta
     theta = calculateTheta(X, rows, cols, y);
