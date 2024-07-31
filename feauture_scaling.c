@@ -132,6 +132,10 @@ double **standardizeData(double **data, int rows, int cols)
         }
     }
 
+    // Free memory
+    free(mean);
+    free(sd);
+
     return output;
 };
 
@@ -158,6 +162,10 @@ double **normalizeData(double **data, int rows, int cols)
             output[i][j] = (data[i][j] - minValues[j]) / (maxValues[j] - minValues[j]);
         }
     }
+
+    // Free memory
+    free(minValues);
+    free(maxValues);
 
     return output;
 };
@@ -194,4 +202,9 @@ int main()
     norm_output = normalizeData(data, rows, cols);
     printf("Matrix norm_output with %d rows and %d cols.\n", rows, cols);
     printMatrix(norm_output, rows, cols, 4);
+
+    // Free memory
+    freeMatrix(data, rows);
+    freeMatrix(st_output, rows);
+    freeMatrix(norm_output, rows);
 }
