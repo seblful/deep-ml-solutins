@@ -57,7 +57,7 @@ double *calculateSD(double **data, int rows, int cols, double *mean)
     // Calculate SD
     for (int i = 0; i < cols; i++)
     {
-        sd[i] = sqrt(sd[i] / (rows - 1));
+        sd[i] = sqrt(sd[i] / (rows));
     }
 
     return sd;
@@ -74,6 +74,20 @@ double **standardizeData(double **data, int rows, int cols)
     double *sd = calculateSD(data, rows, cols, mean);
     printf("Vector sd with size %d.\n", cols);
     printVector(sd, cols, 4);
+
+    // Allocate memory for output
+    double **output = allocateMatrix(rows, cols);
+
+    // Standardize
+    for (int i = 0; i < rows; i++)
+    {
+        for (int j = 0; j < cols; j++)
+        {
+            output[i][j] = (data[i][j] - mean[j]) / sd[j];
+        }
+    }
+
+    return output;
 };
 
 double **normalizeData(double **data) {};
@@ -103,6 +117,9 @@ int main()
 
     // Standatization
     st_output = standardizeData(data, rows, cols);
+    printf("Matrix st_output with %d rows and %d cols.\n", rows, cols);
+    printMatrix(st_output, rows, cols, 4);
+
     // Normalization
     norm_output = normalizeData(data);
 }
