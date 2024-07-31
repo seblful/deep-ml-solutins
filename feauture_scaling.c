@@ -146,6 +146,20 @@ double **normalizeData(double **data, int rows, int cols)
     double *maxValues = findMax(data, rows, cols);
     printf("Vector maxValues with size %d.\n", cols);
     printVector(maxValues, cols, 4);
+
+    // Allocate memory for output
+    double **output = allocateMatrix(rows, cols);
+
+    // Normalize
+    for (int i = 0; i < rows; i++)
+    {
+        for (int j = 0; j < cols; j++)
+        {
+            output[i][j] = (data[i][j] - minValues[j]) / (maxValues[j] - minValues[j]);
+        }
+    }
+
+    return output;
 };
 
 int main()
@@ -178,4 +192,6 @@ int main()
 
     // Normalization
     norm_output = normalizeData(data, rows, cols);
+    printf("Matrix norm_output with %d rows and %d cols.\n", rows, cols);
+    printMatrix(norm_output, rows, cols, 4);
 }
