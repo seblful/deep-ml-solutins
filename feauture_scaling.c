@@ -57,10 +57,55 @@ double *calculateSD(double **data, int rows, int cols, double *mean)
     // Calculate SD
     for (int i = 0; i < cols; i++)
     {
-        sd[i] = sqrt(sd[i] / (rows));
+        sd[i] = sqrt(sd[i] / (rows - 1)); // It's a sample
     }
 
     return sd;
+};
+
+double *findMin(double **data, int rows, int cols)
+{
+    // Allocate memory for minValues
+    double *minValues = (double *)malloc(sizeof(double) * cols);
+
+    // Initialize sum of values to INFINITY
+    for (int j = 0; j < cols; j++)
+    {
+        minValues[j] = INFINITY;
+    }
+
+    // Iterate through data and find min
+    for (int i = 0; i < rows; i++)
+    {
+        for (int j = 0; j < cols; j++)
+        {
+            minValues[j] = fmin(minValues[j], data[i][j]);
+        }
+    }
+
+    return minValues;
+};
+
+double *findMax(double **data, int rows, int cols)
+{ // Allocate memory for maxValues
+    double *maxValues = (double *)malloc(sizeof(double) * cols);
+
+    // Initialize sum of values to -INFINITY
+    for (int j = 0; j < cols; j++)
+    {
+        maxValues[j] = -INFINITY;
+    }
+
+    // Iterate through data and find min
+    for (int i = 0; i < rows; i++)
+    {
+        for (int j = 0; j < cols; j++)
+        {
+            maxValues[j] = fmax(maxValues[j], data[i][j]);
+        }
+    }
+
+    return maxValues;
 };
 
 double **standardizeData(double **data, int rows, int cols)
@@ -90,7 +135,18 @@ double **standardizeData(double **data, int rows, int cols)
     return output;
 };
 
-double **normalizeData(double **data) {};
+double **normalizeData(double **data, int rows, int cols)
+{
+    // Calculate minValues
+    double *minValues = findMin(data, rows, cols);
+    printf("Vector minValues with size %d.\n", cols);
+    printVector(minValues, cols, 4);
+
+    // Calculate maxValues
+    double *maxValues = findMax(data, rows, cols);
+    printf("Vector maxValues with size %d.\n", cols);
+    printVector(maxValues, cols, 4);
+};
 
 int main()
 {
@@ -121,5 +177,5 @@ int main()
     printMatrix(st_output, rows, cols, 4);
 
     // Normalization
-    norm_output = normalizeData(data);
+    norm_output = normalizeData(data, rows, cols);
 }
