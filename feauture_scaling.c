@@ -3,7 +3,39 @@
 
 #include "utils.h"
 
-double **standardizeData(double **data) {};
+double *calculateMean(double **data, int rows, int cols)
+{
+
+    // Allocate memory for mean
+    double *mean = (double *)malloc(sizeof(double) * cols);
+
+    // Iterate through data
+    for (int i = 0; i < rows; i++)
+    {
+        for (int j = 0; j < cols; j++)
+        {
+            mean[j] += data[i][j];
+        }
+    }
+
+    // Calculate mean
+    for (int i = 0; i < cols; i++)
+    {
+        mean[i] = mean[i] / rows;
+    }
+
+    return mean;
+};
+
+double calculateSD() {};
+
+double **standardizeData(double **data, int rows, int cols)
+{
+    // Calculate mean
+    double *mean = calculateMean(data, rows, cols);
+    printf("Vector mean with size %d.\n", cols);
+    printVector(mean, cols, 4);
+};
 
 double **normalizeData(double **data) {};
 
@@ -31,7 +63,7 @@ int main()
     double **st_output, **norm_output;
 
     // Standatization
-    st_output = standardizeData(data);
-    // Normalisation
+    st_output = standardizeData(data, rows, cols);
+    // Normalization
     norm_output = normalizeData(data);
 }
