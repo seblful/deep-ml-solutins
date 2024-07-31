@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 
 #include "utils.h"
 
@@ -9,7 +10,13 @@ double *calculateMean(double **data, int rows, int cols)
     // Allocate memory for mean
     double *mean = (double *)malloc(sizeof(double) * cols);
 
-    // Iterate through data
+    // Initialize sum of values to 0
+    for (int j = 0; j < cols; j++)
+    {
+        mean[j] = 0;
+    }
+
+    // Iterate through data and add values to mean vector
     for (int i = 0; i < rows; i++)
     {
         for (int j = 0; j < cols; j++)
@@ -27,7 +34,34 @@ double *calculateMean(double **data, int rows, int cols)
     return mean;
 };
 
-double calculateSD() {};
+double *calculateSD(double **data, int rows, int cols, double *mean)
+{
+    // Allocate memory for SD
+    double *sd = (double *)malloc(sizeof(double) * cols);
+
+    // Initialize sum of squares to 0
+    for (int j = 0; j < cols; j++)
+    {
+        sd[j] = 0;
+    }
+
+    // Iterate through data and add pre-calculated values to sd vector
+    for (int i = 0; i < rows; i++)
+    {
+        for (int j = 0; j < cols; j++)
+        {
+            sd[j] += pow((data[i][j] - mean[j]), 2);
+        }
+    }
+
+    // Calculate SD
+    for (int i = 0; i < cols; i++)
+    {
+        sd[i] = sqrt(sd[i] / (rows - 1));
+    }
+
+    return sd;
+};
 
 double **standardizeData(double **data, int rows, int cols)
 {
@@ -35,6 +69,11 @@ double **standardizeData(double **data, int rows, int cols)
     double *mean = calculateMean(data, rows, cols);
     printf("Vector mean with size %d.\n", cols);
     printVector(mean, cols, 4);
+
+    // Calculate standart deviation
+    double *sd = calculateSD(data, rows, cols, mean);
+    printf("Vector sd with size %d.\n", cols);
+    printVector(sd, cols, 4);
 };
 
 double **normalizeData(double **data) {};
