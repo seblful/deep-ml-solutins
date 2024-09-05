@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include <assert.h>
 
 void printVector(double *v, int n, int precision)
@@ -7,6 +8,24 @@ void printVector(double *v, int n, int precision)
     for (int i = 0; i < n; i++)
     {
         printf("%.*f ", precision, v[i]);
+    }
+    printf("\n");
+};
+
+void printUintVector(uint8_t *v, int n)
+{
+    for (int i = 0; i < n; i++)
+    {
+        printf("%u ", v[i]);
+    }
+    printf("\n");
+};
+
+void printIntVector(int *v, int n)
+{
+    for (int i = 0; i < n; i++)
+    {
+        printf("%d ", v[i]);
     }
     printf("\n");
 };

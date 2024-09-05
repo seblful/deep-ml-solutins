@@ -3,9 +3,12 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 
 void printMatrix(double **m, int rows, int cols, int precision);
 void printVector(double *v, int n, int precision);
+void printUintVector(uint8_t *v, int n);
+void printIntVector(int *v, int n);
 
 double **allocateMatrix(int rows, int cols);
 void freeMatrix(double **matrix, int rows);
