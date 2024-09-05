@@ -8,7 +8,7 @@
 double square(double num)
 {
     return num * num;
-}
+};
 
 double findDistance(double *point, double *centroid)
 {
@@ -26,11 +26,19 @@ double findDistance(double *point, double *centroid)
     return sqrt(sum);
 };
 
-void assignPoints(double **points, int p_rows, double **centroids, int k, uint8_t *centroidsIdx, double *centroidsDist)
+void assignPoints(double **points, int p_rows, double **centroids, int k, uint8_t *centroidsIdx)
 {
     // Declare value to store distance
     double distance;
 
+    // Create array to store centroids-points distances and assign each value to infinity
+    double *centroidsDist = (double *)malloc(p_rows * sizeof(double));
+    for (int i = 0; i < p_rows; i++)
+    {
+        centroidsDist[i] = INFINITY;
+    };
+
+    // Assign points
     for (int i = 0; i < p_rows; i++)
     {
         for (int j = 0; j < k; j++)
@@ -47,31 +55,57 @@ void assignPoints(double **points, int p_rows, double **centroids, int k, uint8_
     };
 };
 
-void printVector2(uint8_t *v, int n)
+double *findMean(double **points, int p_rows, int k, uint8_t *centroidsIdx)
 {
-    for (int i = 0; i < n; i++)
+    // Create array to store sums of points for each centroid
+    double **pointSums = (double **)malloc(k * sizeof(double *));
+    for (int i = 0; i < k; i++)
     {
-        printf("%u ", v[i]);
-    }
-    printf("\n");
+        pointSums[i] = (double *)malloc(2 * sizeof(double));
+    };
+
+    // Create array to store number of points for each centroid
+    int *pointNums = (int *)calloc(k, sizeof(int));
+
+    // Declare temp index
+    uint8_t tempIdx;
+
+    // Add points values to pointSums accordingly to centroidsIdx
+    for (int i = 0; i < p_rows; i++)
+    {
+        tempIdx = centroidsIdx[i];
+        pointNums[tempIdx] += 1;
+        printf("%u\n", tempIdx);
+        for (int j = 0; j < 2; j++)
+        {
+
+            pointSums[tempIdx][j] += points[i][j];
+        };
+    };
+
+    printIntVector(pointNums, 2);
+    ;
 };
+
+void updateCentroids(double **points, int p_rows, double **centroids, int k, uint8_t *centroidsIdx)
+{
+    // Declare vector to store means of points for each vector
+    double *pointMeans;
+
+    // Calculate mean of points
+}
 
 int kMeansClustering(double **points, int p_rows, double **centroids, int k, int max_iterations)
 {
     // Create array to store centroids-points indexes
     uint8_t *centroidsIdx = (uint8_t *)malloc(p_rows * sizeof(uint8_t));
 
-    // Create array to store centroids-points distances and assign each value to infinity
-    double *centroidsDist = (double *)malloc(p_rows * sizeof(double));
-    for (int i = 0; i < p_rows; i++)
-    {
-        centroidsDist[i] = INFINITY;
-    }
-
     // Assign each point to centroid
-    assignPoints(points, p_rows, centroids, k, centroidsIdx, centroidsDist);
-    printVector(centroidsDist, p_rows, 3);
-    printVector2(centroidsIdx, p_rows);
+    assignPoints(points, p_rows, centroids, k, centroidsIdx);
+    printUintVector(centroidsIdx, p_rows);
+
+    // Update centroids
+    updateCentroids(points, p_rows, centroids, k, centroidsIdx);
 };
 
 int main()
