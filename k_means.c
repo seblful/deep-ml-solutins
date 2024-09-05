@@ -36,10 +36,24 @@ void assignPoints(double **points, int p_rows, double **centroids, int k, uint8_
         for (int j = 0; j < k; j++)
         {
             distance = findDistance(points[i], centroids[j]);
-            printf("Distance %.2f\n", distance);
-            // if distance
+
+            // If distance smaller, assign distance and index
+            if (distance < centroidsDist[i])
+            {
+                centroidsDist[i] = distance;
+                centroidsIdx[i] = j;
+            };
         };
     };
+};
+
+void printVector2(uint8_t *v, int n)
+{
+    for (int i = 0; i < n; i++)
+    {
+        printf("%u ", v[i]);
+    }
+    printf("\n");
 };
 
 int kMeansClustering(double **points, int p_rows, double **centroids, int k, int max_iterations)
@@ -56,6 +70,8 @@ int kMeansClustering(double **points, int p_rows, double **centroids, int k, int
 
     // Assign each point to centroid
     assignPoints(points, p_rows, centroids, k, centroidsIdx, centroidsDist);
+    printVector(centroidsDist, p_rows, 3);
+    printVector2(centroidsIdx, p_rows);
 };
 
 int main()
