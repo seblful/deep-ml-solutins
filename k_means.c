@@ -5,7 +5,14 @@
 
 #include "utils.h"
 
-double square(double num)
+typedef struct
+{
+    double **sums;
+    int *nums;
+} SumsNums;
+
+double
+square(double num)
 {
     return num * num;
 };
@@ -55,8 +62,11 @@ void assignPoints(double **points, int p_rows, double **centroids, int k, uint8_
     };
 };
 
-double *findMean(double **points, int p_rows, int k, uint8_t *centroidsIdx)
+SumsNums findSumsNums(double **points, int p_rows, int k, uint8_t *centroidsIdx)
 {
+    // Declare SumsNums struct
+    SumsNums pointSumsNums;
+
     // Create array to store sums of points for each centroid
     double **pointSums = (double **)malloc(k * sizeof(double *));
     for (int i = 0; i < k; i++)
@@ -75,7 +85,7 @@ double *findMean(double **points, int p_rows, int k, uint8_t *centroidsIdx)
     {
         tempIdx = centroidsIdx[i];
         pointNums[tempIdx] += 1;
-        printf("%u\n", tempIdx);
+
         for (int j = 0; j < 2; j++)
         {
 
@@ -83,16 +93,29 @@ double *findMean(double **points, int p_rows, int k, uint8_t *centroidsIdx)
         };
     };
 
-    printIntVector(pointNums, 2);
-    ;
+    // Assign values to SumsNums
+    pointSumsNums.nums = pointNums;
+    pointSumsNums.sums = pointSums;
+
+    return pointSumsNums;
 };
 
 void updateCentroids(double **points, int p_rows, double **centroids, int k, uint8_t *centroidsIdx)
 {
-    // Declare vector to store means of points for each vector
-    double *pointMeans;
+    // Declare SumsNums struct
+    SumsNums pointSumsNums;
 
     // Calculate mean of points
+    pointSumsNums = findSumsNums(points, p_rows, k, centroidsIdx);
+
+    // Divide each sum to number of each centroid
+    for (int i = 0; i < k; i++)
+    {
+        for (int j = 0; j < 2; j++)
+        {
+            centroids[i][j] = pointSumsNums.sums[i][j] / pointSumsNums.nums[i];
+        };
+    };
 }
 
 int kMeansClustering(double **points, int p_rows, double **centroids, int k, int max_iterations)
