@@ -60,6 +60,8 @@ void assignPoints(double **points, int p_rows, int p_cols, double **centroids, i
             };
         };
     };
+    // Free memory
+    free(centroidsDist);
 };
 
 SumsNums findSumsNums(double **points, int p_rows, int p_cols, int k, uint8_t *centroidsIdx)
@@ -116,6 +118,10 @@ void updateCentroids(double **points, int p_rows, int p_cols, double **centroids
             centroids[i][j] = pointSumsNums.sums[i][j] / pointSumsNums.nums[i];
         };
     };
+
+    // Free memory
+    free(pointSumsNums.sums);
+    free(pointSumsNums.nums);
 }
 
 int kMeansClustering(double **points, int p_rows, int p_cols, double **centroids, int k, int max_iterations)
@@ -136,6 +142,9 @@ int kMeansClustering(double **points, int p_rows, int p_cols, double **centroids
 
     // Print centroids position
     printMatrix(centroids, k, p_cols, 2);
+
+    // Free memory
+    free(centroidsIdx);
 };
 
 int main()
@@ -185,6 +194,10 @@ int main()
 
     // Start k-Means Clustering
     kMeansClustering(points, rows, cols, centroids, k, max_iterations);
+
+    // Free memory
+    freeMatrix(points, rows);
+    freeMatrix(centroids, k);
 
     return 0;
 }
