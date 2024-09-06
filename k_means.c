@@ -17,14 +17,14 @@ square(double num)
     return num * num;
 };
 
-double findDistance(double *point, double *centroid)
+double findDistance(double *point, int p_cols, double *centroid)
 {
     // Declare differences and sum
     double diff;
     double sum = 0;
 
     // Iterate through point and centroid and add distance
-    for (int i = 0; i < 2; i++)
+    for (int i = 0; i < p_cols; i++)
     {
         diff = point[i] - centroid[i];
         sum += square(diff);
@@ -33,7 +33,7 @@ double findDistance(double *point, double *centroid)
     return sqrt(sum);
 };
 
-void assignPoints(double **points, int p_rows, double **centroids, int k, uint8_t *centroidsIdx)
+void assignPoints(double **points, int p_rows, int p_cols, double **centroids, int k, uint8_t *centroidsIdx)
 {
     // Declare value to store distance
     double distance;
@@ -50,7 +50,7 @@ void assignPoints(double **points, int p_rows, double **centroids, int k, uint8_
     {
         for (int j = 0; j < k; j++)
         {
-            distance = findDistance(points[i], centroids[j]);
+            distance = findDistance(points[i], p_cols, centroids[j]);
 
             // If distance smaller, assign distance and index
             if (distance < centroidsDist[i])
@@ -62,7 +62,7 @@ void assignPoints(double **points, int p_rows, double **centroids, int k, uint8_
     };
 };
 
-SumsNums findSumsNums(double **points, int p_rows, int k, uint8_t *centroidsIdx)
+SumsNums findSumsNums(double **points, int p_rows, int p_cols, int k, uint8_t *centroidsIdx)
 {
     // Declare SumsNums struct
     SumsNums pointSumsNums;
@@ -71,7 +71,7 @@ SumsNums findSumsNums(double **points, int p_rows, int k, uint8_t *centroidsIdx)
     double **pointSums = (double **)malloc(k * sizeof(double *));
     for (int i = 0; i < k; i++)
     {
-        pointSums[i] = (double *)malloc(2 * sizeof(double));
+        pointSums[i] = (double *)malloc(p_cols * sizeof(double));
     };
 
     // Create array to store number of points for each centroid
@@ -86,7 +86,7 @@ SumsNums findSumsNums(double **points, int p_rows, int k, uint8_t *centroidsIdx)
         tempIdx = centroidsIdx[i];
         pointNums[tempIdx] += 1;
 
-        for (int j = 0; j < 2; j++)
+        for (int j = 0; j < p_cols; j++)
         {
 
             pointSums[tempIdx][j] += points[i][j];
@@ -100,35 +100,35 @@ SumsNums findSumsNums(double **points, int p_rows, int k, uint8_t *centroidsIdx)
     return pointSumsNums;
 };
 
-void updateCentroids(double **points, int p_rows, double **centroids, int k, uint8_t *centroidsIdx)
+void updateCentroids(double **points, int p_rows, int p_cols, double **centroids, int k, uint8_t *centroidsIdx)
 {
     // Declare SumsNums struct
     SumsNums pointSumsNums;
 
     // Calculate mean of points
-    pointSumsNums = findSumsNums(points, p_rows, k, centroidsIdx);
+    pointSumsNums = findSumsNums(points, p_rows, p_cols, k, centroidsIdx);
 
     // Divide each sum to number of each centroid
     for (int i = 0; i < k; i++)
     {
-        for (int j = 0; j < 2; j++)
+        for (int j = 0; j < p_cols; j++)
         {
             centroids[i][j] = pointSumsNums.sums[i][j] / pointSumsNums.nums[i];
         };
     };
 }
 
-int kMeansClustering(double **points, int p_rows, double **centroids, int k, int max_iterations)
+int kMeansClustering(double **points, int p_rows, int p_cols, double **centroids, int k, int max_iterations)
 {
     // Create array to store centroids-points indexes
     uint8_t *centroidsIdx = (uint8_t *)malloc(p_rows * sizeof(uint8_t));
 
     // Assign each point to centroid
-    assignPoints(points, p_rows, centroids, k, centroidsIdx);
+    assignPoints(points, p_rows, p_cols, centroids, k, centroidsIdx);
     printUintVector(centroidsIdx, p_rows);
 
     // Update centroids
-    updateCentroids(points, p_rows, centroids, k, centroidsIdx);
+    updateCentroids(points, p_rows, p_cols, centroids, k, centroidsIdx);
 };
 
 int main()
@@ -177,7 +177,7 @@ int main()
     printMatrix(centroids, k, k, 0);
 
     // Start k-Means Clustering
-    kMeansClustering(points, rows, centroids, k, max_iterations);
+    kMeansClustering(points, rows, cols, centroids, k, max_iterations);
 
     return 0;
 }
