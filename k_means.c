@@ -123,12 +123,19 @@ int kMeansClustering(double **points, int p_rows, int p_cols, double **centroids
     // Create array to store centroids-points indexes
     uint8_t *centroidsIdx = (uint8_t *)malloc(p_rows * sizeof(uint8_t));
 
-    // Assign each point to centroid
-    assignPoints(points, p_rows, p_cols, centroids, k, centroidsIdx);
-    printUintVector(centroidsIdx, p_rows);
+    // Iterate through max iterations
+    for (int i = 0; i < max_iterations; i++)
+    {
+        // Assign each point to centroid
+        assignPoints(points, p_rows, p_cols, centroids, k, centroidsIdx);
+        printUintVector(centroidsIdx, p_rows);
 
-    // Update centroids
-    updateCentroids(points, p_rows, p_cols, centroids, k, centroidsIdx);
+        // Update centroids
+        updateCentroids(points, p_rows, p_cols, centroids, k, centroidsIdx);
+    };
+
+    // Print centroids position
+    printMatrix(centroids, k, p_cols, 2);
 };
 
 int main()
