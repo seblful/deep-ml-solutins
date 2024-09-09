@@ -1,8 +1,28 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <string.h>
+#include <time.h>
 
 #include "utils.h"
+
+void shuffleRows(double **array, int rows, int cols)
+{
+    srand(time(NULL)); // Seed the random number generator
+
+    for (int i = rows - 1; i > 0; i--)
+    {
+        int r = rand() % (i + 1);
+
+        // Swap rows
+        for (int j = 0; j < cols; j++)
+        {
+            int temp = array[i][j];
+            array[i][j] = array[r][j];
+            array[r][j] = temp;
+        }
+    }
+}
 
 void swapSubArrays(double **array, int cols, int a, int b)
 {
@@ -21,8 +41,15 @@ void swapSubArrays(double **array, int cols, int a, int b)
     };
 };
 
-void createCrossData(double **data, int rows, int cols, int k, double ***crossData)
+void createCrossData(double **data, int rows, int cols, double ***crossData, int k, bool shuffle)
 {
+    // Shuffle data
+    if (shuffle == 1)
+    {
+        shuffleRows(data, rows, cols);
+    };
+
+    // Iterate k-times
     for (int i = 0; i < k; i++)
     {
         // Create copy of data
@@ -46,6 +73,9 @@ int main()
     // Number of folds
     int k = 5;
 
+    // Init shuffle variable
+    bool shuffle = true;
+
     // Initialization of data
     int rows = 5, cols = 2;
     double **data = allocateMatrix(rows, cols);
@@ -68,7 +98,7 @@ int main()
     double ***crossData = allocate3dMatrix(k, rows, cols);
 
     // Create cross data
-    createCrossData(data, rows, cols, k, crossData);
+    createCrossData(data, rows, cols, crossData, k, shuffle);
 
     // Print cross data
     print3DMatrix(crossData, k, rows, cols, 0);
