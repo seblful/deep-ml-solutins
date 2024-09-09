@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "utils.h"
 
@@ -14,10 +15,10 @@ void swapSubArrays(double **array, int cols, int a, int b)
     // Swap array
     for (int i = 0; i < cols; i++)
     {
-        int temp = array[a][i];
+        double temp = array[a][i];
         array[a][i] = array[b][i];
         array[b][i] = temp;
-    }
+    };
 };
 
 void createCrossData(double **data, int rows, int cols, int k, double ***crossData)
@@ -29,15 +30,16 @@ void createCrossData(double **data, int rows, int cols, int k, double ***crossDa
 
         for (int j = 0; j < rows; j++)
         {
-            array[j] = data[j];
+            memcpy(array[j], data[j], cols * sizeof(double));
         }
 
         // Swap subarrays in array
         swapSubArrays(array, cols, 0, i);
 
         // Add array to crossData
+        crossData[i] = array;
     };
-};
+}
 
 int main()
 {
@@ -67,6 +69,8 @@ int main()
 
     // Create cross data
     createCrossData(data, rows, cols, k, crossData);
+
+    print3DMatrix(crossData, k, rows, cols, 0);
 
     return 0;
 }
