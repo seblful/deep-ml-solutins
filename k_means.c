@@ -11,8 +11,7 @@ typedef struct
     int *nums;
 } SumsNums;
 
-double
-square(double num)
+double square(double num)
 {
     return num * num;
 };
