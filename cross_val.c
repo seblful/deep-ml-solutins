@@ -70,7 +70,12 @@ int main()
     // Create cross data
     createCrossData(data, rows, cols, k, crossData);
 
+    // Print cross data
     print3DMatrix(crossData, k, rows, cols, 0);
+
+    // Free memory
+    freeMatrix(data, rows);
+    free3dMatrix(crossData, k, rows);
 
     return 0;
 }
