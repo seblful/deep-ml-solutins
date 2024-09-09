@@ -6,6 +6,7 @@
 #include <stdint.h>
 
 void printMatrix(double **m, int rows, int cols, int precision);
+void print3DMatrix(double ***m, int x, int y, int z, int precision);
 void printVector(double *v, int n, int precision);
 void printUintVector(uint8_t *v, int n);
 void printIntVector(int *v, int n);

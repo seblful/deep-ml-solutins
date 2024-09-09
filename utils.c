@@ -43,6 +43,16 @@ void printMatrix(double **m, int rows, int cols, int precision)
     return;
 };
 
+void print3DMatrix(double ***m, int x, int y, int z, int precision)
+{
+    for (int i = 0; i < x; i++)
+    {
+        printf("\n");
+        printMatrix(m[i], y, z, precision);
+    }
+    return;
+};
+
 double *matrixVectorMultiply(double **M, int rows, int cols, double *v, int n, double *result)
 {
     // Assert if wrong size of matrix or vector
