@@ -123,6 +123,21 @@ double **allocateMatrix(int rows, int cols)
     return matrix;
 }
 
+// Function to allocate a 3D array
+double ***allocate3dMatrix(int x, int y, int z)
+{
+    double ***arr = malloc(x * sizeof(double **));
+    for (int i = 0; i < x; i++)
+    {
+        arr[i] = malloc(y * sizeof(double *));
+        for (int j = 0; j < y; j++)
+        {
+            arr[i][j] = malloc(z * sizeof(double));
+        }
+    }
+    return arr;
+}
+
 // Function to free a 2D array
 void freeMatrix(int **matrix, int rows)
 {
@@ -131,4 +146,17 @@ void freeMatrix(int **matrix, int rows)
         free(matrix[i]);
     }
     free(matrix);
+}
+
+void free3dMatrix(double ***arr, int x, int y)
+{
+    for (int i = 0; i < x; i++)
+    {
+        for (int j = 0; j < y; j++)
+        {
+            free(arr[i][j]); // Free each 1D array
+        }
+        free(arr[i]); // Free each 2D array
+    }
+    free(arr); // Free the array of pointers
 }

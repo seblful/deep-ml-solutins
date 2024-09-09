@@ -11,7 +11,9 @@ void printUintVector(uint8_t *v, int n);
 void printIntVector(int *v, int n);
 
 double **allocateMatrix(int rows, int cols);
+double ***allocate3dMatrix(int x, int y, int z);
 void freeMatrix(double **matrix, int rows);
+void free3dMatrix(double ***arr, int x, int y);
 
 double *matrixVectorMultiply(double **M, int rows, int cols, double *v, int n, double *result);
 void matrixMultiply(double **A, int rowsA, int colsA, double **B, int rowsB, int colsB, double **C);
