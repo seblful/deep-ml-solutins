@@ -3,6 +3,42 @@
 
 #include "utils.h"
 
+void swapSubArrays(double **array, int cols, int a, int b)
+{
+    // Return if a and b are equal
+    if (a == b)
+    {
+        return;
+    };
+
+    // Swap array
+    for (int i = 0; i < cols; i++)
+    {
+        int temp = array[a][i];
+        array[a][i] = array[b][i];
+        array[b][i] = temp;
+    }
+};
+
+void createCrossData(double **data, int rows, int cols, int k, double ***crossData)
+{
+    for (int i = 0; i < k; i++)
+    {
+        // Create copy of data
+        double **array = allocateMatrix(rows, cols);
+
+        for (int j = 0; j < rows; j++)
+        {
+            array[j] = data[j];
+        }
+
+        // Swap subarrays in array
+        swapSubArrays(array, cols, 0, i);
+
+        // Add array to crossData
+    };
+};
+
 int main()
 {
     // Number of folds
@@ -25,6 +61,12 @@ int main()
     // Print data
     printf("Matrix data with %d rows and %d cols.\n", rows, cols);
     printMatrix(data, rows, cols, 0);
+
+    // Init result array
+    double ***crossData = allocate3dMatrix(k, rows, cols);
+
+    // Create cross data
+    createCrossData(data, rows, cols, k, crossData);
 
     return 0;
 }
