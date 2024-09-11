@@ -4,26 +4,6 @@
 
 #include "utils.h"
 
-typedef struct
-{
-    double *eigenValues;
-    double **eigenVectors;
-} Eigen;
-
-double calculateMean(double *v, int size)
-{
-    // Declare sum
-    double sum = 0;
-
-    // Iterating through vector and calculate mean
-    for (int i = 0; i < size; i++)
-    {
-        sum += v[i];
-    }
-
-    return sum / size;
-}
-
 // Function to compute the covariance matrix
 double **createCovarianceMatrix(double **data, int rows, int cols)
 {
@@ -70,73 +50,6 @@ void standardize(double **data, int rows, int cols)
             data[i][j] = (data[i][j] - mean) / std_dev;
         }
     }
-}
-
-Eigen findEig(double **matrix, int size)
-{
-    if (size != 2)
-    {
-        fprintf(stderr, "This function only supports 2x2 matrices.\n");
-        exit(EXIT_FAILURE);
-    }
-
-    // Allocate memory for eigenvalue vector and eigenvectors matrix
-    double *eigenvalues = (double *)malloc(size * sizeof(double));
-    double **eigenvectors = allocateMatrix(size, size);
-
-    double a = matrix[0][0];
-    double b = matrix[0][1];
-    double c = matrix[1][0];
-    double d = matrix[1][1];
-
-    // Calculate the trace and determinant of the matrix
-    double trace = a + d;
-    double determinant = a * d - b * c;
-
-    // Calculate the eigenvalues using the quadratic formula
-    double discriminant = trace * trace - 4 * determinant;
-    if (discriminant < 0)
-    {
-        fprintf(stderr, "The matrix has complex eigenvalues.\n");
-        free(eigenvalues);
-        freeMatrix(eigenvectors, size);
-        exit(EXIT_FAILURE);
-    }
-
-    discriminant = sqrt(discriminant);
-    eigenvalues[0] = (trace + discriminant) / 2;
-    eigenvalues[1] = (trace - discriminant) / 2;
-
-    // Print eigenvalues
-    printf("Vector eigenvalues with size %d.\n", size);
-    printVector(eigenvalues, size, 2);
-
-    // Calculate the eigenvectors
-    for (int i = 0; i < 2; i++)
-    {
-        double lambda = eigenvalues[i];
-        if (b != 0 || c != 0)
-        {
-            eigenvectors[i][0] = b != 0 ? lambda - d : 1;  // Eigenvector calculation
-            eigenvectors[i][1] = b != 0 ? -a : lambda - a; // Adjust based on lambda
-        }
-        else
-        {
-            eigenvectors[i][0] = 1; // Default eigenvector
-            eigenvectors[i][1] = 0;
-        }
-    }
-
-    // Print eigenvectors
-    printf("Matrix eigenvectors with %d rows and %d cols.\n", size, size);
-    printMatrix(eigenvectors, size, size, 2);
-
-    // Assign vectors and values to struct
-    Eigen eigen;
-    eigen.eigenValues = eigenvalues;
-    eigen.eigenVectors = eigenvectors;
-
-    return eigen;
 }
 
 // Function to find eigenvalues and eigenvectors
@@ -190,7 +103,7 @@ double **performPCA(double **data, int rows, int cols, int k)
 
     // Init covariance matrix;
     double **covMatrix = createCovarianceMatrix(data, rows, cols);
-    printf("Covariance matrix covMatrix with %d rows and %d cols.\n", cols, cols);
+    printf("Matrix covMatrix with %d rows and %d cols.\n", cols, cols);
     printMatrix(covMatrix, cols, cols, 1);
 
     // Init principal components
@@ -209,6 +122,11 @@ double **performPCA(double **data, int rows, int cols, int k)
 
         free(eigenvector);
     }
+
+    // Free memory
+    freeMatrix(covMatrix, cols);
+
+    return princComps;
 }
 
 int main()
@@ -235,5 +153,8 @@ int main()
     printMatrix(data, rows, cols, 1);
 
     // Perform PCA
-    double **result = performPCA(data, rows, cols, k);
+    double **princComps = performPCA(data, rows, cols, k);
+
+    printf("Matrix princComps with %d rows and %d cols.\n", cols, k);
+    printMatrix(princComps, cols, k, 4);
 };
