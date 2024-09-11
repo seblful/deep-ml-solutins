@@ -24,43 +24,27 @@ double calculateMean(double *v, int size)
     return sum / size;
 }
 
-double **createCovarianceMatrix(double **m, int f, int r)
+// Function to compute the covariance matrix
+double **createCovarianceMatrix(double **data, int rows, int cols)
 {
-    // Init arrays
-    double *means = malloc(sizeof(double) * f);
-
     // Init result matrix
-    double **result = (double **)malloc(sizeof(double *) * f);
-    for (int i = 0; i < f; i++)
-    {
-        result[i] = (double *)calloc(f, sizeof(double));
-    };
+    double **result = allocateMatrix(rows, cols);
 
-    // Calculate means
-    for (int i = 0; i < f; i++)
+    for (int i = 0; i < cols; i++)
     {
-        means[i] = calculateMean(m[i], r);
-    };
-
-    // Fill matrix
-    for (int i = 0; i < f; i++)
-    {
-        for (int j = 0; j < f; j++)
+        for (int j = 0; j < cols; j++)
         {
-            double sum = 0;
-            for (int k = 0; k < r; k++)
+            result[i][j] = 0.0;
+            for (int k = 0; k < rows; k++)
             {
-                sum += (m[i][k] - means[i]) * (m[j][k] - means[j]);
+                result[i][j] += data[k][i] * data[k][j];
             }
-            result[i][j] = sum / (r - 1);
+            result[i][j] /= (rows - 1);
         }
-    };
-
-    // Free memory
-    free(means);
+    }
 
     return result;
-};
+}
 
 // Function to standardize the dataset
 void standardize(double **data, int rows, int cols)
@@ -155,7 +139,51 @@ Eigen findEig(double **matrix, int size)
     return eigen;
 }
 
-double **performPCA(double **data, int rows, int cols)
+// Function to find eigenvalues and eigenvectors
+void powerIteration(double **matrix, double *eigenvector, int size, int max_iter)
+{
+    double *b_k = (double *)malloc(size * sizeof(double));
+    for (int i = 0; i < size; i++)
+    {
+        b_k[i] = 1.0;
+    }
+
+    for (int iter = 0; iter < max_iter; iter++)
+    {
+        double *b_k1 = (double *)malloc(size * sizeof(double));
+        for (int i = 0; i < size; i++)
+        {
+            b_k1[i] = 0.0;
+            for (int j = 0; j < size; j++)
+            {
+                b_k1[i] += matrix[i][j] * b_k[j];
+            }
+        }
+
+        double norm = 0.0;
+        for (int i = 0; i < size; i++)
+        {
+            norm += b_k1[i] * b_k1[i];
+        }
+        norm = sqrt(norm);
+
+        for (int i = 0; i < size; i++)
+        {
+            b_k[i] = b_k1[i] / norm;
+        }
+
+        free(b_k1);
+    }
+
+    for (int i = 0; i < size; i++)
+    {
+        eigenvector[i] = b_k[i];
+    }
+
+    free(b_k);
+}
+
+double **performPCA(double **data, int rows, int cols, int k)
 {
     // Standardize data
     standardize(data, rows, cols);
@@ -165,8 +193,22 @@ double **performPCA(double **data, int rows, int cols)
     printf("Covariance matrix covMatrix with %d rows and %d cols.\n", cols, cols);
     printMatrix(covMatrix, cols, cols, 1);
 
-    // Init eigen struct and find eigenvectors and eigenvalues
-    Eigen eigen = findEig(covMatrix, cols);
+    // Init principal components
+    double **princComps = allocateMatrix(cols, k);
+
+    // Find the eigenvalues and eigenvectors
+    for (int i = 0; i < k; i++)
+    {
+        double *eigenvector = (double *)malloc(cols * sizeof(double));
+        powerIteration(covMatrix, eigenvector, cols, 1000);
+
+        for (int j = 0; j < cols; j++)
+        {
+            princComps[j][i] = eigenvector[j];
+        }
+
+        free(eigenvector);
+    }
 }
 
 int main()
@@ -193,5 +235,5 @@ int main()
     printMatrix(data, rows, cols, 1);
 
     // Perform PCA
-    double **result = performPCA(data, rows, cols);
+    double **result = performPCA(data, rows, cols, k);
 };
