@@ -157,4 +157,8 @@ int main()
 
     printf("Matrix princComps with %d rows and %d cols.\n", cols, k);
     printMatrix(princComps, cols, k, 4);
+
+    // Free memory
+    freeMatrix(data, rows);
+    freeMatrix(princComps, cols);
 };
