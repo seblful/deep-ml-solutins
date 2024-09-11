@@ -22,28 +22,57 @@ double calculateMean(double *v, int size)
     }
 
     return sum / size;
-};
+}
 
 double **createCovarianceMatrix(double **m, int f, int r)
 {
+    // Check for valid input
+    if (f <= 0 || r <= 0)
+    {
+        fprintf(stderr, "Invalid dimensions for covariance matrix.\n");
+        return NULL;
+    }
+
     // Init arrays
     double *means = malloc(sizeof(double) * f);
+    if (means == NULL)
+    {
+        fprintf(stderr, "Memory allocation failed for means.\n");
+        return NULL;
+    }
 
     // Init result matrix
     double **result = (double **)malloc(sizeof(double *) * f);
+    if (result == NULL)
+    {
+        fprintf(stderr, "Memory allocation failed for result matrix.\n");
+        free(means);
+        return NULL;
+    }
     for (int i = 0; i < f; i++)
     {
-        result[i] = (double *)calloc(sizeof(double), f);
-    };
+        result[i] = (double *)calloc(f, sizeof(double)); // Corrected calloc usage
+        if (result[i] == NULL)
+        {
+            fprintf(stderr, "Memory allocation failed for result matrix row.\n");
+            // Free previously allocated memory
+            for (int j = 0; j < i; j++)
+            {
+                free(result[j]);
+            }
+            free(result);
+            free(means);
+            return NULL;
+        }
+    }
 
-    // Calculate means
+    // Calculate means for each feature
     for (int i = 0; i < f; i++)
     {
         means[i] = calculateMean(m[i], r);
-    };
+    }
 
-    // Fill matrix
-
+    // Fill covariance matrix
     for (int i = 0; i < f; i++)
     {
         for (int j = 0; j < f; j++)
@@ -53,18 +82,24 @@ double **createCovarianceMatrix(double **m, int f, int r)
             {
                 sum += (m[i][k] - means[i]) * (m[j][k] - means[j]);
             }
-            result[i][j] = sum / (r - 1);
+            result[i][j] = sum / (r - 1); // Sample covariance
         }
-    };
+    }
 
-    // Free memory
+    // Free memory for means
     free(means);
 
     return result;
-};
+}
 
 Eigen findEig(double **matrix, int size)
 {
+    if (size != 2)
+    {
+        fprintf(stderr, "This function only supports 2x2 matrices.\n");
+        exit(EXIT_FAILURE);
+    }
+
     // Allocate memory for eigenvalue vector and eigenvectors matrix
     double *eigenvalues = (double *)malloc(size * sizeof(double));
     double **eigenvectors = allocateMatrix(size, size);
@@ -79,38 +114,45 @@ Eigen findEig(double **matrix, int size)
     double determinant = a * d - b * c;
 
     // Calculate the eigenvalues using the quadratic formula
-    double discriminant = sqrt(trace * trace - 4 * determinant);
+    double discriminant = trace * trace - 4 * determinant;
+    if (discriminant < 0)
+    {
+        fprintf(stderr, "The matrix has complex eigenvalues.\n");
+        free(eigenvalues);
+        freeMatrix(eigenvectors, size);
+        exit(EXIT_FAILURE);
+    }
+
+    discriminant = sqrt(discriminant);
     eigenvalues[0] = (trace + discriminant) / 2;
     eigenvalues[1] = (trace - discriminant) / 2;
 
     // Print eigenvalues
-    printf("Vector eigenvalues with size %d.\n", size);
-    printVector(eigenvalues, size, 2);
+    printf("Eigenvalues:\n");
+    printf("%lf, %lf\n", eigenvalues[0], eigenvalues[1]);
 
     // Calculate the eigenvectors
     for (int i = 0; i < 2; i++)
     {
         double lambda = eigenvalues[i];
-        if (b != 0)
+        if (b != 0 || c != 0)
         {
-            eigenvectors[i][0] = lambda - d;
-            eigenvectors[i][1] = b;
-        }
-        else if (c != 0)
-        {
-            eigenvectors[i][0] = c;
-            eigenvectors[i][1] = lambda - a;
+            eigenvectors[i][0] = b != 0 ? lambda - d : 1;  // Eigenvector calculation
+            eigenvectors[i][1] = b != 0 ? -a : lambda - a; // Adjust based on lambda
         }
         else
         {
-            eigenvectors[i][0] = 1;
+            eigenvectors[i][0] = 1; // Default eigenvector
             eigenvectors[i][1] = 0;
         }
     }
 
     // Print eigenvectors
-    printf("Matrix eigenvectors with %d rows and %d cols.\n", size, size);
-    printMatrix(eigenvectors, size, size, 2);
+    printf("Eigenvectors:\n");
+    for (int i = 0; i < size; i++)
+    {
+        printf("%lf, %lf\n", eigenvectors[i][0], eigenvectors[i][1]);
+    }
 
     // Assign vectors and values to struct
     Eigen eigen;
