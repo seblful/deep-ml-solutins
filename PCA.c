@@ -33,7 +33,7 @@ double **createCovarianceMatrix(double **m, int f, int r)
     double **result = (double **)malloc(sizeof(double *) * f);
     for (int i = 0; i < f; i++)
     {
-        result[i] = (double *)calloc(sizeof(double), f);
+        result[i] = (double *)calloc(f, sizeof(double));
     };
 
     // Calculate means
@@ -43,7 +43,6 @@ double **createCovarianceMatrix(double **m, int f, int r)
     };
 
     // Fill matrix
-
     for (int i = 0; i < f; i++)
     {
         for (int j = 0; j < f; j++)
@@ -62,6 +61,32 @@ double **createCovarianceMatrix(double **m, int f, int r)
 
     return result;
 };
+
+// Function to standardize the dataset
+void standardize(double **data, int rows, int cols)
+{
+    for (int j = 0; j < cols; j++)
+    {
+        double mean = 0.0;
+        for (int i = 0; i < rows; i++)
+        {
+            mean += data[i][j];
+        }
+        mean /= rows;
+
+        double std_dev = 0.0;
+        for (int i = 0; i < rows; i++)
+        {
+            std_dev += (data[i][j] - mean) * (data[i][j] - mean);
+        }
+        std_dev = sqrt(std_dev / rows);
+
+        for (int i = 0; i < rows; i++)
+        {
+            data[i][j] = (data[i][j] - mean) / std_dev;
+        }
+    }
+}
 
 Eigen findEig(double **matrix, int size)
 {
@@ -99,8 +124,8 @@ Eigen findEig(double **matrix, int size)
     eigenvalues[1] = (trace - discriminant) / 2;
 
     // Print eigenvalues
-    printf("Eigenvalues:\n");
-    printf("%lf, %lf\n", eigenvalues[0], eigenvalues[1]);
+    printf("Vector eigenvalues with size %d.\n", size);
+    printVector(eigenvalues, size, 2);
 
     // Calculate the eigenvectors
     for (int i = 0; i < 2; i++)
@@ -119,11 +144,8 @@ Eigen findEig(double **matrix, int size)
     }
 
     // Print eigenvectors
-    printf("Eigenvectors:\n");
-    for (int i = 0; i < size; i++)
-    {
-        printf("%lf, %lf\n", eigenvectors[i][0], eigenvectors[i][1]);
-    }
+    printf("Matrix eigenvectors with %d rows and %d cols.\n", size, size);
+    printMatrix(eigenvectors, size, size, 2);
 
     // Assign vectors and values to struct
     Eigen eigen;
@@ -135,6 +157,9 @@ Eigen findEig(double **matrix, int size)
 
 double **performPCA(double **data, int rows, int cols)
 {
+    // Standardize data
+    standardize(data, rows, cols);
+
     // Init covariance matrix;
     double **covMatrix = createCovarianceMatrix(data, rows, cols);
     printf("Covariance matrix covMatrix with %d rows and %d cols.\n", cols, cols);
