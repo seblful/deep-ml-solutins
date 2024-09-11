@@ -19,24 +19,53 @@ double calculateMean(double *v, int size)
 
 double **createCovarianceMatrix(double **m, int f, int r)
 {
+    // Check for valid input
+    if (f <= 0 || r <= 0)
+    {
+        fprintf(stderr, "Invalid dimensions for covariance matrix.\n");
+        return NULL;
+    }
+
     // Init arrays
     double *means = malloc(sizeof(double) * f);
+    if (means == NULL)
+    {
+        fprintf(stderr, "Memory allocation failed for means.\n");
+        return NULL;
+    }
 
     // Init result matrix
     double **result = (double **)malloc(sizeof(double *) * f);
+    if (result == NULL)
+    {
+        fprintf(stderr, "Memory allocation failed for result matrix.\n");
+        free(means);
+        return NULL;
+    }
     for (int i = 0; i < f; i++)
     {
-        result[i] = (double *)calloc(sizeof(double), f);
-    };
+        result[i] = (double *)calloc(f, sizeof(double)); // Corrected calloc usage
+        if (result[i] == NULL)
+        {
+            fprintf(stderr, "Memory allocation failed for result matrix row.\n");
+            // Free previously allocated memory
+            for (int j = 0; j < i; j++)
+            {
+                free(result[j]);
+            }
+            free(result);
+            free(means);
+            return NULL;
+        }
+    }
 
-    // Calculate means
+    // Calculate means for each feature
     for (int i = 0; i < f; i++)
     {
         means[i] = calculateMean(m[i], r);
-    };
+    }
 
-    // Fill matrix
-
+    // Fill covariance matrix
     for (int i = 0; i < f; i++)
     {
         for (int j = 0; j < f; j++)
@@ -46,15 +75,15 @@ double **createCovarianceMatrix(double **m, int f, int r)
             {
                 sum += (m[i][k] - means[i]) * (m[j][k] - means[j]);
             }
-            result[i][j] = sum / (r - 1);
+            result[i][j] = sum / (r - 1); // Sample covariance
         }
-    };
+    }
 
-    // Free memory
+    // Free memory for means
     free(means);
 
     return result;
-};
+}
 
 int main()
 {
