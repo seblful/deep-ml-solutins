@@ -23,6 +23,12 @@ attr createAttr(int id, char *name, char *value)
     return newAttribute;
 };
 
+void printAttr(attr attribute)
+{
+
+    printf("Attribute id: %d, name: '%s', value: '%s'.\n", attribute.id, attribute.name, attribute.value);
+}
+
 int main()
 {
     // Init and fill attribute struct
@@ -33,11 +39,10 @@ int main()
         attributes[i] = createAttr(i, properties[i], "");
     }
 
-    // // Print attributes
-    // printf("Array attributes with size %d:\n", NUM_ATTRIBUTES);
-    // for (int i = 0; i < NUM_ATTRIBUTES; i++)
-    // {
-
-    //     printf("Name of attr: %s.\n", attributes[i].name);
-    // };
+    // Print attributes
+    printf("Array attributes with size %d:\n", NUM_ATTRIBUTES);
+    for (int i = 0; i < NUM_ATTRIBUTES; i++)
+    {
+        printAttr(attributes[i]);
+    };
 }
