@@ -1,12 +1,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 
 #include "utils.h"
 
 #define MAX_STR_LENGTH 50
 #define DATA_LENGTH 4
 #define NUM_ATTRIBUTES 4
+#define NUM_RESULTS 2
 
 typedef struct
 {
@@ -31,9 +33,31 @@ void printAttr(attr attribute)
     printf("Attribute id: %d, name: '%s', value: '%s'.\n", attribute.id, attribute.name, attribute.value);
 }
 
-float calculateEntropy()
+float calculateEntropy(uint8_t *results, int n)
 {
-    ;
+    // Find number of positive and negative answers
+    int counters[2] = {0, 0};
+
+    for (int i = 0; i < n; i++)
+    {
+        if (results[i] == 1)
+        {
+            counters[0] += 1;
+        }
+        else
+        {
+            counters[1] += 1;
+        };
+    };
+
+    double entropy = 0;
+    double p;
+
+    for (int i = 0; i < 2; i++)
+    {
+        p = counters[i] / (double)n;
+        entropy += -(p * log2(p));
+    }
 }
 
 float calculateIG()
@@ -41,9 +65,9 @@ float calculateIG()
     ;
 }
 
-void createDecisionTree()
+void createDecisionTree(char data[DATA_LENGTH][NUM_ATTRIBUTES][MAX_STR_LENGTH], uint8_t results[DATA_LENGTH])
 {
-    ;
+    calculateEntropy(results, 4);
 }
 
 int main()
@@ -71,4 +95,7 @@ int main()
     {
         printAttr(attributes[i]);
     };
+
+    // Create decision tree
+    createDecisionTree(data, results);
 }
