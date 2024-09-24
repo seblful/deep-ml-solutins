@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <string.h>
 #include <math.h>
 
@@ -65,9 +66,52 @@ float calculateIG()
     ;
 }
 
+void createWordSet(char data[DATA_LENGTH][NUM_ATTRIBUTES][MAX_STR_LENGTH], char wordSet[3][50], int i)
+{
+    int wordSetInd = 0;
+
+    for (int j = 0; j < DATA_LENGTH; j++)
+    {
+        bool isUnique = true;
+
+        for (int k = 0; k < 3; k++)
+        {
+
+            if (strcmp(wordSet[k], data[j][i]) == 0)
+            {
+                isUnique = false;
+                break;
+            };
+        }
+
+        if (isUnique == true)
+        {
+            strcpy(wordSet[wordSetInd], data[j][i]);
+            wordSetInd += 1;
+        }
+    }
+};
+
 void createDecisionTree(char data[DATA_LENGTH][NUM_ATTRIBUTES][MAX_STR_LENGTH], uint8_t results[DATA_LENGTH])
 {
-    calculateEntropy(results, 4);
+    double infGain;
+
+    for (int i = 0; i < NUM_ATTRIBUTES; i++)
+    {
+        char wordSet[3][50] = {"", "", ""};
+        createWordSet(data, wordSet, i);
+
+        for (int k = 0; k < 3; k++)
+        {
+            if (strcmp(wordSet[k], "") != 0)
+            {
+                printf("%s\n", wordSet[k]);
+            }
+        }
+        printf("\n");
+
+        // do smth with set of words
+    }
 }
 
 int main()
