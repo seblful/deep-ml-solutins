@@ -52,8 +52,9 @@ double calculateEntropy(uint8_t *results, int n)
     return entropy;
 }
 
-double calculateIG(char data[DATA_LENGTH][NUM_ATTRIBUTES][MAX_STR_LENGTH],
-                   uint8_t results[DATA_LENGTH],
+double calculateIG(const char ***data,
+                   int dataLength,
+                   uint8_t *results,
                    char wordSet[SET_LENGTH][MAX_STR_LENGTH],
                    double entropy,
                    int i)
@@ -67,11 +68,11 @@ double calculateIG(char data[DATA_LENGTH][NUM_ATTRIBUTES][MAX_STR_LENGTH],
             break;
         }
 
-        uint8_t wordResults[DATA_LENGTH];
+        uint8_t *wordResults = (uint8_t *)calloc(dataLength, sizeof(uint8_t));
         int counter = 0;
         int n = 0;
 
-        for (int j = 0; j < DATA_LENGTH; j++)
+        for (int j = 0; j < dataLength; j++)
         {
             if (strcmp(wordSet[k], data[j][i]) == 0)
             {
@@ -80,7 +81,7 @@ double calculateIG(char data[DATA_LENGTH][NUM_ATTRIBUTES][MAX_STR_LENGTH],
             };
         };
 
-        double p = (double)n / DATA_LENGTH;
+        double p = (double)n / dataLength;
 
         tSum += p * calculateEntropy(wordResults, n);
     }
@@ -88,7 +89,7 @@ double calculateIG(char data[DATA_LENGTH][NUM_ATTRIBUTES][MAX_STR_LENGTH],
     return entropy - tSum;
 }
 
-void createWordSet(char data[DATA_LENGTH][NUM_ATTRIBUTES][MAX_STR_LENGTH], char wordSet[SET_LENGTH][MAX_STR_LENGTH], int i)
+void createWordSet(const char ***data, char wordSet[SET_LENGTH][MAX_STR_LENGTH], int i)
 {
     int wordSetInd = 0;
 
@@ -114,7 +115,7 @@ void createWordSet(char data[DATA_LENGTH][NUM_ATTRIBUTES][MAX_STR_LENGTH], char 
     }
 };
 
-void createDecisionTree(char data[DATA_LENGTH][NUM_ATTRIBUTES][MAX_STR_LENGTH], uint8_t results[DATA_LENGTH])
+void createDecisionTree(const char ***data, uint8_t *results)
 {
     double infGain;
     double entropy = calculateEntropy(results, DATA_LENGTH);
@@ -124,15 +125,56 @@ void createDecisionTree(char data[DATA_LENGTH][NUM_ATTRIBUTES][MAX_STR_LENGTH], 
         char wordSet[SET_LENGTH][MAX_STR_LENGTH] = {"", "", ""};
         createWordSet(data, wordSet, i);
 
-        infGain = calculateIG(data, results, wordSet, entropy, i);
+        infGain = calculateIG(data, DATA_LENGTH, results, wordSet, entropy, i);
         printf("%f\n", infGain);
     }
 }
 
+char ***createData(const char *init_data[DATA_LENGTH][NUM_ATTRIBUTES])
+{
+    // Dynamically allocate memory for data
+    char ***data = (char ***)malloc(DATA_LENGTH * sizeof(char **));
+    for (int i = 0; i < DATA_LENGTH; i++)
+    {
+        data[i] = (char **)malloc(NUM_ATTRIBUTES * sizeof(char *));
+        for (int j = 0; j < NUM_ATTRIBUTES; j++)
+        {
+            data[i][j] = (char *)malloc(MAX_STR_LENGTH * sizeof(char));
+        }
+    };
+
+    // Copy initial data into dynamically allocated array
+    for (int i = 0; i < DATA_LENGTH; i++)
+    {
+        for (int j = 0; j < NUM_ATTRIBUTES; j++)
+        {
+            strcpy(data[i][j], init_data[i][j]);
+        }
+    }
+
+    return data;
+}
+
+void freeData(char ***data)
+{
+    for (int i = 0; i < DATA_LENGTH; i++)
+    {
+        for (int j = 0; j < NUM_ATTRIBUTES; j++)
+        {
+            free(data[i][j]);
+        }
+        free(data[i]);
+    }
+    free(data);
+}
+
 int main()
 {
-    // Init data
-    char data[DATA_LENGTH][NUM_ATTRIBUTES][MAX_STR_LENGTH] = {
+    // Init and fill properties
+    const char *properties[NUM_ATTRIBUTES] = {"Outlook", "Temperature", "Humidity", "Wind"};
+
+    // Init and fill data
+    const char *init_data[DATA_LENGTH][NUM_ATTRIBUTES] = {
         {"Sunny", "Hot", "High", "Weak"},
         {"Sunny", "Hot", "High", "Strong"},
         {"Overcast", "Hot", "High", "Weak"},
@@ -148,10 +190,25 @@ int main()
         {"Overcast", "Hot", "Normal", "Weak"},
         {"Rain", "Mild", "High", "Strong"}};
 
-    uint8_t results[DATA_LENGTH] = {0, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 0};
+    char ***data = createData(init_data);
 
-    // Init and fill attribute struct
-    char properties[NUM_ATTRIBUTES][MAX_STR_LENGTH] = {"Outlook", "Temperature", "Humidity", "Wind"};
+    // Print the data
+    for (int i = 0; i < DATA_LENGTH; i++)
+    {
+        for (int j = 0; j < NUM_ATTRIBUTES; j++)
+        {
+            printf("%s ", data[i][j]);
+        }
+        printf("\n");
+    }
+
+    // Init and fill results
+    uint8_t init_results[] = {0, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 0};
+    uint8_t *results = (uint8_t *)malloc(sizeof(uint8_t) * DATA_LENGTH);
+    for (int i = 0; i < DATA_LENGTH; i++)
+    {
+        results[i] = init_results[i];
+    };
 
     // Create decision tree
     createDecisionTree(data, results);
