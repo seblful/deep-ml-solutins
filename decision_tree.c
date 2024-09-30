@@ -163,7 +163,11 @@ int findBestAttribute(char ***data, int dataLength, uint8_t *results, char wordS
 }
 
 // Recursive function to create the decision tree
-Node *createDecisionTreeRecursive(char ***data, int dataLength, uint8_t *results, const char *properties[NUM_ATTRIBUTES], char wordSet[NUM_ATTRIBUTES][SET_LENGTH][MAX_STR_LENGTH])
+Node *createDecisionTreeRecursive(char ***data,
+                                  int dataLength,
+                                  uint8_t *results,
+                                  const char *properties[NUM_ATTRIBUTES],
+                                  char wordSet[NUM_ATTRIBUTES][SET_LENGTH][MAX_STR_LENGTH])
 {
     // Base case: all examples have the same result
     if (allSameResult(results, dataLength))
@@ -356,16 +360,6 @@ int main()
         {"Rain", "Mild", "High", "Strong"}};
 
     char ***data = createData(init_data);
-
-    // Print the data
-    for (int i = 0; i < DATA_LENGTH; i++)
-    {
-        for (int j = 0; j < NUM_ATTRIBUTES; j++)
-        {
-            printf("%s ", data[i][j]);
-        }
-        printf("\n");
-    }
 
     // Init and fill results
     uint8_t init_results[] = {0, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 0};
