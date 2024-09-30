@@ -12,29 +12,6 @@
 #define NUM_RESULTS 2
 #define SET_LENGTH 3
 
-typedef struct
-{
-    int id;
-    char name[MAX_STR_LENGTH];
-    char value[MAX_STR_LENGTH];
-} attr;
-
-attr createAttr(int id, char *name, char *value)
-{
-    attr newAttribute;
-
-    newAttribute.id = id;
-    strcpy(newAttribute.name, name);
-
-    return newAttribute;
-};
-
-void printAttr(attr attribute)
-{
-
-    printf("Attribute id: %d, name: '%s', value: '%s'.\n", attribute.id, attribute.name, attribute.value);
-}
-
 double calculateEntropy(uint8_t *results, int n)
 {
     // // print
@@ -175,18 +152,6 @@ int main()
 
     // Init and fill attribute struct
     char properties[NUM_ATTRIBUTES][MAX_STR_LENGTH] = {"Outlook", "Temperature", "Humidity", "Wind"};
-    attr *attributes = (attr *)malloc(NUM_ATTRIBUTES * sizeof(attr));
-    for (int i = 0; i < NUM_ATTRIBUTES; i++)
-    {
-        attributes[i] = createAttr(i, properties[i], "");
-    }
-
-    // Print attributes
-    printf("Array attributes with size %d:\n", NUM_ATTRIBUTES);
-    for (int i = 0; i < NUM_ATTRIBUTES; i++)
-    {
-        printAttr(attributes[i]);
-    };
 
     // Create decision tree
     createDecisionTree(data, results);
