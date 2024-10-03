@@ -1,13 +1,77 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 
 #include "utils.h"
+
+typedef struct ResultSVM
+{
+    double *alphas;
+    double beta;
+} resultSVM;
+
+double square(x)
+{
+    return x * x;
+}
+
+double linearKernel(double *x, double *y, int n)
+{
+    double sum = 0;
+    for (int i = 0; i < n; i++)
+    {
+        sum += x[i] * y[i];
+    }
+
+    return sum;
+}
+
+double RBFKernel(double *x, double *y, int n)
+{
+    double sigma = 1;
+
+    // np.exp(-np.linalg.norm(x-y)**2 / (2 * (sigma ** 2)))
+    double *v = (double *)malloc(n * sizeof(double));
+
+    // Find difference between vectors
+    for (int i = 0; i < n; i++)
+    {
+        v[i] = x[i] - y[i];
+    }
+
+    // Find norm of vector
+    double norm = 0;
+    for (int i = 0; i < n; i++)
+    {
+        norm += square(abs(v[i]));
+    }
+    norm = sqrt(norm);
+
+    double result = exp(-square(norm) / (2 * (square(sigma))));
+
+    return result;
+};
+
+resultSVM pegasosKernelSVM(double **data, int rows, int cols, int *labels, char kernel[], double lambda_val, int iterations)
+{
+    // Create array and allocate memory for alphas
+    double *alphas = (double *)malloc(rows * sizeof(double));
+    double beta = 0;
+
+    for (int t = 1; t < iterations + 1; t++)
+    {
+        for (int i = 0; i < rows; i++)
+        {
+            double eta = 1.0 / (lambda_val * t);
+        }
+    }
+};
 
 int main()
 {
     // Initialization of parameters
-    char kernel = "rbf";
-    double lambda_cal = 0.01;
+    char kernel[] = "rbf";
+    double lambda_val = 0.01;
     int iterations = 100;
 
     // Initialization of data
@@ -42,7 +106,8 @@ int main()
     printf("Vector y with size %d.\n", rows);
     printIntVector(labels, rows);
 
-    // labels = np.array([]),
+    // SVM
+    resultSVM result = pegasosKernelSVM(data, rows, cols, labels, kernel, lambda_val, iterations);
 
     return 0;
 }
