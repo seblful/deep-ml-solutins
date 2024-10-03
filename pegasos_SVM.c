@@ -10,27 +10,26 @@ typedef struct ResultSVM
     double beta;
 } resultSVM;
 
-double square(x)
+double square(double x)
 {
     return x * x;
 }
 
 double linearKernel(double *x, double *y, int n)
 {
-    double sum = 0;
+    double dot = 0;
     for (int i = 0; i < n; i++)
     {
-        sum += x[i] * y[i];
+        dot += x[i] * y[i];
     }
 
-    return sum;
+    return dot;
 }
 
 double RBFKernel(double *x, double *y, int n)
 {
     double sigma = 1;
 
-    // np.exp(-np.linalg.norm(x-y)**2 / (2 * (sigma ** 2)))
     double *v = (double *)malloc(n * sizeof(double));
 
     // Find difference between vectors
@@ -43,7 +42,7 @@ double RBFKernel(double *x, double *y, int n)
     double norm = 0;
     for (int i = 0; i < n; i++)
     {
-        norm += square(abs(v[i]));
+        norm += square(v[i]);
     }
     norm = sqrt(norm);
 
@@ -52,10 +51,10 @@ double RBFKernel(double *x, double *y, int n)
     return result;
 };
 
-resultSVM pegasosKernelSVM(double **data, int rows, int cols, int *labels, char kernel[], double lambda_val, int iterations)
+resultSVM pegasosKernelSVM(double **data, int rows, int cols, double *labels, char kernel[], double lambda_val, int iterations)
 {
     // Create array and allocate memory for alphas
-    double *alphas = (double *)malloc(rows * sizeof(double));
+    double *alphas = (double *)calloc(rows, sizeof(double));
     double beta = 0;
 
     for (int t = 1; t < iterations + 1; t++)
@@ -63,8 +62,28 @@ resultSVM pegasosKernelSVM(double **data, int rows, int cols, int *labels, char 
         for (int i = 0; i < rows; i++)
         {
             double eta = 1.0 / (lambda_val * t);
+
+            double decision = 0;
+
+            for (int j = 0; j < rows; j++)
+            {
+                decision += alphas[j] * labels[j] * RBFKernel(data[j], data[i], cols) + beta;
+            }
+
+            // Change alphas and betas
+            if (labels[i] * decision < 1)
+            {
+                alphas[i] += eta * (labels[i] - lambda_val * alphas[i]);
+                beta += eta * labels[i];
+            }
         }
     }
+    // Fill resultSVM
+    resultSVM result;
+    result.alphas = alphas;
+    result.beta = beta;
+
+    return result;
 };
 
 int main()
@@ -95,7 +114,7 @@ int main()
 
     // Init labels
     int init_labels[] = {1, 1, -1, -1};
-    int *labels = (int *)malloc(rows * sizeof(int));
+    double *labels = (double *)malloc(rows * sizeof(double));
 
     for (int i = 0; i < rows; i++)
     {
@@ -104,10 +123,13 @@ int main()
 
     // Print labels
     printf("Vector y with size %d.\n", rows);
-    printIntVector(labels, rows);
+    printVector(labels, rows, 0);
 
     // SVM
     resultSVM result = pegasosKernelSVM(data, rows, cols, labels, kernel, lambda_val, iterations);
+    printf("Vector alpha with size %d.\n", rows);
+    printVector(result.alphas, rows, 3);
+    printf("Beta: %d.\n", result.beta);
 
     return 0;
 }
