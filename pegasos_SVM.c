@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <math.h>
 
 #include "utils.h"
@@ -48,6 +49,9 @@ double RBFKernel(double *x, double *y, int n)
 
     double result = exp(-square(norm) / (2 * (square(sigma))));
 
+    // Free memory
+    free(v);
+
     return result;
 };
 
@@ -56,6 +60,8 @@ resultSVM pegasosKernelSVM(double **data, int rows, int cols, double *labels, ch
     // Create array and allocate memory for alphas
     double *alphas = (double *)calloc(rows, sizeof(double));
     double beta = 0;
+
+    resultSVM result = {NULL, 0};
 
     for (int t = 1; t < iterations + 1; t++)
     {
@@ -67,8 +73,23 @@ resultSVM pegasosKernelSVM(double **data, int rows, int cols, double *labels, ch
 
             for (int j = 0; j < rows; j++)
             {
-                decision += alphas[j] * labels[j] * RBFKernel(data[j], data[i], cols) + beta;
+                if (strcmp(kernel, "linear") == 0)
+                {
+                    decision += alphas[j] * labels[j] * linearKernel(data[j], data[i], cols);
+                    printf("here \n");
+                }
+                else if (strcmp(kernel, "rbf") == 0)
+                {
+                    decision += alphas[j] * labels[j] * RBFKernel(data[j], data[i], cols);
+                }
+                else
+                {
+                    printf("Unknown kernel type\n");
+                    return result;
+                }
             }
+
+            decision += beta;
 
             // Change alphas and betas
             if (labels[i] * decision < 1)
@@ -79,7 +100,6 @@ resultSVM pegasosKernelSVM(double **data, int rows, int cols, double *labels, ch
         }
     }
     // Fill resultSVM
-    resultSVM result;
     result.alphas = alphas;
     result.beta = beta;
 
@@ -129,7 +149,12 @@ int main()
     resultSVM result = pegasosKernelSVM(data, rows, cols, labels, kernel, lambda_val, iterations);
     printf("Vector alpha with size %d.\n", rows);
     printVector(result.alphas, rows, 3);
-    printf("Beta: %d.\n", result.beta);
+    printf("Beta: %f.\n", result.beta);
+
+    // Free memory
+    freeMatrix(data, rows);
+    free(labels);
+    free(result.alphas);
 
     return 0;
 }
