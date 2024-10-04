@@ -4,9 +4,38 @@
 
 #include "utils.h"
 
+double sigmoid(double z)
+{
+    return 1 / (1 + exp(-z));
+}
+
+double *singleNeuron(double **data, int rows, int cols, double *weights, double bias)
+{
+    // Create array to store results
+    double *result = (double *)malloc(rows * sizeof(double));
+
+    // Find probabilities
+    for (int i = 0; i < rows; i++)
+    {
+        double z = 0;
+
+        for (int j = 0; j < cols; j++)
+        {
+            z += data[i][j] * weights[j];
+        };
+
+        z += bias;
+
+        result[i] = sigmoid(z);
+    };
+
+    return result;
+};
+
 int main()
 {
-    int rows = 3, cols = 2;
+    int rows = 3;
+    int cols = 2;
 
     // Init and fill matrix feautures
     double **features = allocateMatrix(rows, cols);
@@ -43,6 +72,19 @@ int main()
 
     // Init bias
     double bias = -0.1;
+
+    // Pass through single neuron
+    double *result = singleNeuron(features, rows, cols, weights, bias);
+
+    // Print result
+    printf("Vector result with size %d.\n", rows);
+    printVector(result, rows, 4);
+
+    // Free memory
+    freeMatrix(features, rows);
+    free(labels);
+    free(weights);
+    free(result);
 
     return 0;
 }
