@@ -30,36 +30,30 @@ double linearKernel(double *x, double *y, int n)
 double RBFKernel(double *x, double *y, int n)
 {
     double sigma = 1;
+    double diff;
 
-    double *v = (double *)malloc(n * sizeof(double));
-
-    // Find difference between vectors
-    for (int i = 0; i < n; i++)
-    {
-        v[i] = x[i] - y[i];
-    }
-
-    // Find norm of vector
+    // Find norm of vector through difference between vectors
     double norm = 0;
     for (int i = 0; i < n; i++)
     {
-        norm += square(v[i]);
+        diff = x[i] - y[i];
+        norm += square(diff);
     }
+
     norm = sqrt(norm);
 
     double result = exp(-square(norm) / (2 * (square(sigma))));
 
-    // Free memory
-    free(v);
-
     return result;
 };
 
-resultSVM pegasosKernelSVM(double **data, int rows, int cols, double *labels, char kernel[], double lambda_val, int iterations)
+resultSVM pegasosKernelSVM(double **data, int rows, int cols, double *labels, char kernelType[], double lambda_val, int iterations)
 {
     // Create array and allocate memory for alphas
     double *alphas = (double *)calloc(rows, sizeof(double));
     double beta = 0;
+
+    double kernel;
 
     resultSVM result = {NULL, 0};
 
@@ -73,20 +67,21 @@ resultSVM pegasosKernelSVM(double **data, int rows, int cols, double *labels, ch
 
             for (int j = 0; j < rows; j++)
             {
-                if (strcmp(kernel, "linear") == 0)
+                if (strcmp(kernelType, "linear") == 0)
                 {
-                    decision += alphas[j] * labels[j] * linearKernel(data[j], data[i], cols);
-                    printf("here \n");
+
+                    kernel = linearKernel(data[j], data[i], cols);
                 }
-                else if (strcmp(kernel, "rbf") == 0)
+                else if (strcmp(kernelType, "rbf") == 0)
                 {
-                    decision += alphas[j] * labels[j] * RBFKernel(data[j], data[i], cols);
+                    kernel = RBFKernel(data[j], data[i], cols);
                 }
                 else
                 {
                     printf("Unknown kernel type\n");
                     return result;
                 }
+                decision += alphas[j] * labels[j] * kernel;
             }
 
             decision += beta;
@@ -109,7 +104,7 @@ resultSVM pegasosKernelSVM(double **data, int rows, int cols, double *labels, ch
 int main()
 {
     // Initialization of parameters
-    char kernel[] = "rbf";
+    char kernelType[] = "rbf";
     double lambda_val = 0.01;
     int iterations = 100;
 
@@ -146,7 +141,7 @@ int main()
     printVector(labels, rows, 0);
 
     // SVM
-    resultSVM result = pegasosKernelSVM(data, rows, cols, labels, kernel, lambda_val, iterations);
+    resultSVM result = pegasosKernelSVM(data, rows, cols, labels, kernelType, lambda_val, iterations);
     printf("Vector alpha with size %d.\n", rows);
     printVector(result.alphas, rows, 3);
     printf("Beta: %f.\n", result.beta);
