@@ -7,7 +7,7 @@
 double *softmax(double *inputs, int n)
 {
     // Create array of results
-    double *results = (double *)malloc(n * sizeof(double));
+    double *result = (double *)malloc(n * sizeof(double));
 
     double sum;
 
@@ -20,10 +20,10 @@ double *softmax(double *inputs, int n)
     // Find probability of each number
     for (int i = 0; i < n; i++)
     {
-        results[i] = exp(inputs[i]) / sum;
+        result[i] = exp(inputs[i]) / sum;
     }
 
-    return results;
+    return result;
 }
 
 int main()
@@ -45,6 +45,10 @@ int main()
     double *result = softmax(scores, n);
     printf("Vector result with size %d.\n", n);
     printVector(result, n, 4);
+
+    // Free memory
+    free(scores);
+    free(result);
 
     return 0;
 }
