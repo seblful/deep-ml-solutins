@@ -9,6 +9,11 @@ double sigmoid(double z)
     return 1 / (1 + exp(-z));
 }
 
+double square(double x)
+{
+    return x * x;
+}
+
 double *singleNeuron(double **data, int rows, int cols, double *weights, double bias)
 {
     // Create array to store results
@@ -31,6 +36,18 @@ double *singleNeuron(double **data, int rows, int cols, double *weights, double 
 
     return result;
 };
+
+double calculateMSE(double *result, double *labels, int n)
+{
+    double sum = 0;
+
+    for (int i = 0; i < n; i++)
+    {
+        sum += square(result[i] - labels[i]);
+    };
+
+    return sum / n;
+}
 
 int main()
 {
@@ -79,6 +96,10 @@ int main()
     // Print result
     printf("Vector result with size %d.\n", rows);
     printVector(result, rows, 4);
+
+    // Find MSE
+    double MSE = calculateMSE(result, labels, rows);
+    printf("MSE is %.4f.\n", MSE);
 
     // Free memory
     freeMatrix(features, rows);
