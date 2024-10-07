@@ -14,6 +14,38 @@ double sigmoidDer(double z)
     return sigmoid(z) * (1 - sigmoid(z));
 }
 
+double square(double x)
+{
+    return x * x;
+}
+
+double calculateDW(double **data, int rows, int cols, double *result, double *labels)
+{
+
+    double sum = 0;
+
+    for (int i = 0; i < rows; i++)
+    {
+        for (int j = 0; i < cols; i++)
+        {
+            sum += (sigmoid(result[i]) - labels[i]) * sigmoidDer(result[i]) * data[i][j];
+        }
+    }
+
+    return sum * (2 / rows);
+}
+
+double calculateDb(double *result, double *labels, int n)
+{
+    double sum = 0;
+    for (int i = 0; i < n; i++)
+    {
+        sum += (sigmoid(result[i]) - labels[i]) * sigmoidDer(result[i]);
+    };
+
+    return sum * (2 / n);
+}
+
 void forwardPass(double **data, int rows, int cols, double *weights, double bias, double *result)
 {
 
@@ -33,9 +65,21 @@ void forwardPass(double **data, int rows, int cols, double *weights, double bias
     };
 }
 
-void backwardPass()
+void backwardPass(double **data,
+                  int rows,
+                  int cols,
+                  double *result,
+                  double *labels,
+                  double *weights,
+                  double bias,
+                  double lr)
 {
-    ;
+    double dW, db;
+
+    dW = calculateDW(data, rows, cols, result, labels);
+    printf("%f\n", dW);
+    db = calculateDb(result, labels, rows);
+    printf("%f\n", db);
 }
 
 double *singleNeuron(double **data,
@@ -53,6 +97,7 @@ double *singleNeuron(double **data,
     for (int t = 0; t < epochs; t++)
     {
         forwardPass(data, rows, cols, weights, bias, result);
+        backwardPass(data, rows, cols, result, labels, weights, bias, lr);
     };
 }
 
@@ -98,6 +143,13 @@ int main()
     double bias = 0.0;
     double lr = 0.1;
     int epochs = 2;
+
+    //    // Pass through single neuron
+    double *result = singleNeuron(features, rows, cols, labels, weights, bias, lr, epochs);
+
+    // // Print result
+    // printf("Vector result with size %d.\n", rows);
+    // printVector(result, rows, 4);
 
     return 0;
 }
