@@ -4,6 +4,58 @@
 
 #include "utils.h"
 
+double sigmoid(double z)
+{
+    return 1 / (1 + exp(-z));
+}
+
+double sigmoidDer(double z)
+{
+    return sigmoid(z) * (1 - sigmoid(z));
+}
+
+void forwardPass(double **data, int rows, int cols, double *weights, double bias, double *result)
+{
+
+    // Find probabilities
+    for (int i = 0; i < rows; i++)
+    {
+        double z = 0;
+
+        for (int j = 0; j < cols; j++)
+        {
+            z += data[i][j] * weights[j];
+        };
+
+        z += bias;
+
+        result[i] = sigmoid(z);
+    };
+}
+
+void backwardPass()
+{
+    ;
+}
+
+double *singleNeuron(double **data,
+                     int rows,
+                     int cols,
+                     double *labels,
+                     double *weights,
+                     double bias,
+                     double lr,
+                     int epochs)
+{
+    // Create array to store results
+    double *result = (double *)malloc(rows * sizeof(double));
+
+    for (int t = 0; t < epochs; t++)
+    {
+        forwardPass(data, rows, cols, weights, bias, result);
+    };
+}
+
 int main()
 {
     int rows = 3;
@@ -43,7 +95,7 @@ int main()
     printVector(weights, cols, 1);
 
     // Init other parameters
-    double bias = -0.0;
+    double bias = 0.0;
     double lr = 0.1;
     int epochs = 2;
 
