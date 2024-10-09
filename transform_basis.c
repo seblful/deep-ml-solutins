@@ -1,7 +1,65 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 
 #include "utils.h"
+
+double calculateDeterminant(double **M)
+{
+    return M[0][0] * M[1][1] - M[0][1] * M[1][0];
+}
+
+double **createCofactorMatrix(double **M, int rows, int cols)
+{
+    // Allocate memory for matrices
+    double **cofactorMatrix = allocateMatrix(rows, cols);
+    double minorSize = 2;
+    double **minorMatrix = allocateMatrix(minorSize, minorSize);
+
+    // Calculate determinants of minor matrices
+    for (int i = 0; i < rows; i++)
+    {
+        for (int j = 0; j < cols; j++)
+        {
+            int minorRow = 0;
+            for (int row = 0; row < rows; row++)
+            {
+                if (row == i)
+                    continue; // Skip the current row
+                int minorCol = 0;
+                for (int col = 0; col < cols; col++)
+                {
+                    if (col == j)
+                        continue; // Skip the current column
+                    minorMatrix[minorRow][minorCol] = M[row][col];
+                    minorCol++;
+                }
+                minorRow++;
+            }
+
+            cofactorMatrix[i][j] = calculateDeterminant(minorMatrix);
+        };
+    };
+
+    // Free memory
+    free(minorMatrix);
+
+    return cofactorMatrix;
+};
+
+double **createInverseMatrix(double **M, int rows, int cols)
+{
+    // Allocate memory for matrices
+    double **invMatrix = allocateMatrix(rows, cols);
+    double **cofactorMatrix = createCofactorMatrix(M, rows, cols);
+
+    printMatrix(cofactorMatrix, rows, cols, 2);
+};
+
+double **transformMatrix(double **B, double **C, int rows, int cols)
+{
+    double **invMatrix = createInverseMatrix(C, rows, cols);
+}
 
 int main()
 {
@@ -31,6 +89,9 @@ int main()
     printMatrix(B, rows, cols, 2);
     printf("Matrix C with %d rows and %d cols.\n", rows, cols);
     printMatrix(C, rows, cols, 2);
+
+    // Transform matrix
+    double **transfMatrix = transformMatrix(B, C, rows, cols);
 
     // Free memory
     freeMatrix(B, rows);
