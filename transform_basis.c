@@ -63,8 +63,28 @@ double **createAdjacentMatrix(double **cofMatrix, int rows, int cols)
     return adjMatrix;
 };
 
+double calculateDeterminant3x3(double **M)
+{
+    double det;
+
+    det = M[0][0] * (M[1][1] * M[2][2] - M[1][2] * M[2][1]) -
+          M[0][1] * (M[1][0] * M[2][2] - M[1][2] * M[2][0]) +
+          M[0][2] * (M[1][0] * M[2][1] - M[1][1] * M[2][0]);
+
+    return det;
+}
+
 double **createInverseMatrix(double **M, int rows, int cols)
 {
+    // Calculate determinant of original matrix
+    double determinant = calculateDeterminant3x3(M);
+    printf("Determinant: %f.\n", determinant);
+
+    if (determinant == 0)
+    {
+        printf("Inverse of matrix does not exists when determinant is 0.\n");
+    }
+
     // Allocate memory for matrices
     double **invMatrix = allocateMatrix(rows, cols);
 
@@ -76,6 +96,18 @@ double **createInverseMatrix(double **M, int rows, int cols)
     double **adjMatrix = createAdjacentMatrix(cofMatrix, rows, cols);
     printf("Matrix adjMatrix with %d rows and %d cols.\n", rows, cols);
     printMatrix(adjMatrix, rows, cols, 2);
+
+    // Apply the inverse
+    for (int i = 0; i < rows; i++)
+    {
+        for (int j = 0; j < cols; j++)
+        {
+            invMatrix[i][j] = adjMatrix[i][j] / determinant;
+        }
+    }
+
+    printf("Matrix invMatrix with %d rows and %d cols.\n", rows, cols);
+    printMatrix(invMatrix, rows, cols, 4);
 };
 
 double **transformMatrix(double **B, double **C, int rows, int cols)
@@ -92,7 +124,7 @@ int main()
     // Init matrices
     double init_B[] = {1, 0, 0, 0, 1, 0, 0, 0, 1};
     // double init_C[] = {1, 2.3, 3, 4.4, 25, 6, 7.4, 8, 9};
-    // double init_C[] = {1, 2, -1, 2, 1, 2, -1, 2, 1};
+    double init_C[] = {1, 2, -1, 2, 1, 2, -1, 2, 1};
 
     double **B = allocateMatrix(rows, cols);
     double **C = allocateMatrix(rows, cols);
