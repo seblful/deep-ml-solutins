@@ -4,9 +4,20 @@
 
 #include "utils.h"
 
-double calculateDeterminant(double **M)
+double calculateDeterminant2x2(double **M)
 {
     return M[0][0] * M[1][1] - M[1][0] * M[0][1];
+}
+
+double calculateDeterminant3x3(double **M)
+{
+    double det;
+
+    det = M[0][0] * (M[1][1] * M[2][2] - M[1][2] * M[2][1]) -
+          M[0][1] * (M[1][0] * M[2][2] - M[1][2] * M[2][0]) +
+          M[0][2] * (M[1][0] * M[2][1] - M[1][1] * M[2][0]);
+
+    return det;
 }
 
 double **createCofactorMatrix(double **M, int rows, int cols)
@@ -17,29 +28,40 @@ double **createCofactorMatrix(double **M, int rows, int cols)
     double **minorMatrix = allocateMatrix(minorSize, minorSize);
 
     // Calculate determinants of minor matrices
-    for (int i = 0; i < rows; i++)
+    for (int i = 0; i < 3; i++)
     {
-        for (int j = 0; j < cols; j++)
+        for (int j = 0; j < 3; j++)
         {
-            int minorRow = 0;
-            for (int row = 0; row < rows; row++)
+            int row = 0, col = 0;
+
+            for (int r = 0; r < 3; r++)
             {
-                if (row == i)
-                    continue; // Skip the current row
-                int minorCol = 0;
-                for (int col = 0; col < cols; col++)
+                if (r == i)
+                    continue;
+
+                for (int c = 0; c < 3; c++)
                 {
-                    if (col == j)
-                        continue; // Skip the current column
-                    minorMatrix[minorRow][minorCol] = M[row][col];
-                    minorCol++;
+                    if (c == j)
+                        continue;
+
+                    minorMatrix[row][col] = M[r][c];
+                    col++;
                 }
-                minorRow++;
+                row++;
+                col = 0;
             }
 
-            cofactorMatrix[i][j] = calculateDeterminant(minorMatrix);
-        };
-    };
+            // Apply the checkerboard pattern of signs
+            if ((i + j) % 2 != 0)
+            {
+                cofactorMatrix[i][j] = -calculateDeterminant2x2(minorMatrix);
+            }
+            else
+            {
+                cofactorMatrix[i][j] = calculateDeterminant2x2(minorMatrix);
+            }
+        }
+    }
 
     // Free memory
     free(minorMatrix);
@@ -62,17 +84,6 @@ double **createAdjacentMatrix(double **cofMatrix, int rows, int cols)
 
     return adjMatrix;
 };
-
-double calculateDeterminant3x3(double **M)
-{
-    double det;
-
-    det = M[0][0] * (M[1][1] * M[2][2] - M[1][2] * M[2][1]) -
-          M[0][1] * (M[1][0] * M[2][2] - M[1][2] * M[2][0]) +
-          M[0][2] * (M[1][0] * M[2][1] - M[1][1] * M[2][0]);
-
-    return det;
-}
 
 double **createInverseMatrix(double **M, int rows, int cols)
 {
@@ -109,6 +120,10 @@ double **createInverseMatrix(double **M, int rows, int cols)
     printf("Matrix invMatrix with %d rows and %d cols.\n", rows, cols);
     printMatrix(invMatrix, rows, cols, 4);
 
+    // Free memory
+    freeMatrix(cofMatrix, rows);
+    freeMatrix(adjMatrix, rows);
+
     return invMatrix;
 };
 
@@ -122,6 +137,9 @@ double **transformMatrix(double **B, double **C, int rows, int cols)
 
     // Multiply to basis B
     matrixMultiply(invMatrix, rows, cols, B, rows, cols, transfMatrix);
+
+    // Free memory
+    freeMatrix(invMatrix, rows);
 
     return transfMatrix;
 }
