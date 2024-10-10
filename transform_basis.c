@@ -69,22 +69,6 @@ double **createCofactorMatrix(double **M, int rows, int cols)
     return cofactorMatrix;
 };
 
-double **createAdjacentMatrix(double **cofMatrix, int rows, int cols)
-{
-    // Allocate memory for matrix
-    double **adjMatrix = allocateMatrix(rows, cols);
-
-    for (int i = 0; i < rows; i++)
-    {
-        for (int j = 0; j < cols; j++)
-        {
-            adjMatrix[i][j] = cofMatrix[j][i];
-        }
-    };
-
-    return adjMatrix;
-};
-
 double **createInverseMatrix(double **M, int rows, int cols)
 {
     // Calculate determinant of original matrix
@@ -104,7 +88,8 @@ double **createInverseMatrix(double **M, int rows, int cols)
     printf("Matrix cofMatrix with %d rows and %d cols.\n", rows, cols);
     printMatrix(cofMatrix, rows, cols, 2);
 
-    double **adjMatrix = createAdjacentMatrix(cofMatrix, rows, cols);
+    double **adjMatrix = transposeMatrix(cofMatrix, rows, cols);
+    // createAdjacentMatrix(cofMatrix, rows, cols);
     printf("Matrix adjMatrix with %d rows and %d cols.\n", rows, cols);
     printMatrix(adjMatrix, rows, cols, 2);
 
