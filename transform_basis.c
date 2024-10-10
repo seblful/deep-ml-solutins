@@ -6,7 +6,7 @@
 
 double calculateDeterminant(double **M)
 {
-    return M[0][0] * M[1][1] - M[0][1] * M[1][0];
+    return M[0][0] * M[1][1] - M[1][0] * M[0][1];
 }
 
 double **createCofactorMatrix(double **M, int rows, int cols)
@@ -108,11 +108,22 @@ double **createInverseMatrix(double **M, int rows, int cols)
 
     printf("Matrix invMatrix with %d rows and %d cols.\n", rows, cols);
     printMatrix(invMatrix, rows, cols, 4);
+
+    return invMatrix;
 };
 
 double **transformMatrix(double **B, double **C, int rows, int cols)
 {
+    // Create inverse matrix of C
     double **invMatrix = createInverseMatrix(C, rows, cols);
+
+    // Allocate memory for result matrix
+    double **transfMatrix = allocateMatrix(rows, cols);
+
+    // Multiply to basis B
+    matrixMultiply(invMatrix, rows, cols, B, rows, cols, transfMatrix);
+
+    return transfMatrix;
 }
 
 int main()
@@ -123,8 +134,8 @@ int main()
 
     // Init matrices
     double init_B[] = {1, 0, 0, 0, 1, 0, 0, 0, 1};
-    // double init_C[] = {1, 2.3, 3, 4.4, 25, 6, 7.4, 8, 9};
-    double init_C[] = {1, 2, -1, 2, 1, 2, -1, 2, 1};
+    double init_C[] = {1, 2.3, 3, 4.4, 25, 6, 7.4, 8, 9};
+    // double init_C[] = {1, 2, -1, 2, 1, 2, -1, 2, 1};
 
     double **B = allocateMatrix(rows, cols);
     double **C = allocateMatrix(rows, cols);
@@ -147,10 +158,13 @@ int main()
 
     // Transform matrix
     double **transfMatrix = transformMatrix(B, C, rows, cols);
+    printf("Matrix transfMatrix with %d rows and %d cols.\n", rows, cols);
+    printMatrix(transfMatrix, rows, cols, 4);
 
     // Free memory
     freeMatrix(B, rows);
     freeMatrix(C, rows);
+    freeMatrix(transfMatrix, rows);
 
     return 0;
 }
