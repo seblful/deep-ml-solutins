@@ -42,21 +42,31 @@ double *calculateEigenValues(double **ATA)
 double **calculateEigenVectors(double **ATA, double *lambdas)
 {
     // Allocate memory for eigenvectors
-    double **vectors = (double **)malloc(SIZE * sizeof(double *));
+    double **vectors = allocateMatrix(SIZE, SIZE);
 
     // Calculate eigenvectors
-    double v1[2] = {ATA[0][1], lambdas[0] - ATA[0][0]};
-    double v2[2] = {ATA[0][1], lambdas[1] - ATA[0][0]};
-    normalize(v1);
-    normalize(v2);
-
-    // Assign eigenvectors to matrix
-    vectors[0] = v1;
-    vectors[1] = v2;
+    for (int i = 0; i < SIZE; i++)
+    {
+        for (int j = 0; j < SIZE; j++)
+        {
+            if (j % 2 == 0)
+            {
+                vectors[i][j] = ATA[0][1];
+            }
+            else
+            {
+                vectors[i][j] = lambdas[i] - ATA[0][0];
+            }
+        }
+        // Normalize vectors
+        normalize(vectors[i]);
+    }
 
     // Print
     printf("Matrix vectors with %d rows and %d cols.\n", SIZE, SIZE);
     printMatrix(vectors, SIZE, SIZE, SIZE);
+
+    return vectors;
 }
 
 SVDResult decomposeMatrix(double **A, int rows, int cols)
@@ -71,6 +81,27 @@ SVDResult decomposeMatrix(double **A, int rows, int cols)
     // Calculate eigenvalues and eigenvectorss
     double *lambdas = calculateEigenValues(ATA);
     double **vectors = calculateEigenVectors(ATA, lambdas);
+
+    // Allocate memory for matrices
+    double **U = allocateMatrix(SIZE, SIZE);
+    double **S = allocateMatrix(SIZE, SIZE);
+    double **V = allocateMatrix(SIZE, SIZE);
+
+    // Compute S
+    for (int i = 0; i < SIZE; i++)
+    {
+        S[i][i] = sqrt(lambdas[i]);
+    }
+
+    // Compute V
+    V = vectors;
+
+    // Fill result
+    SVDResult result;
+    result.S = S;
+    result.V = V;
+
+    return result;
 }
 
 int main()
@@ -88,6 +119,12 @@ int main()
 
     // Perform SVD
     SVDResult result = decomposeMatrix(A, SIZE, SIZE);
+
+    // Print results
+    printf("Matrix S with %d rows and %d cols.\n", SIZE, SIZE);
+    printMatrix(result.S, SIZE, SIZE, 4);
+    printf("Matrix V with %d rows and %d cols.\n", SIZE, SIZE);
+    printMatrix(result.V, SIZE, SIZE, 4);
 
     return 0;
 }
