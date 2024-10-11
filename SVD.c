@@ -15,9 +15,18 @@ typedef struct SVDResult
 
 void normalize(double *v)
 {
-    double length = sqrt(v[0] * v[0] + v[1] * v[1]);
-    v[0] /= length;
-    v[1] /= length;
+    double sum = 0;
+    for (int i = 0; i < SIZE; i++)
+    {
+        sum += v[i] * v[i];
+    }
+
+    double length = sqrt(sum);
+
+    for (int i = 0; i < SIZE; i++)
+    {
+        v[i] /= length;
+    }
 }
 
 double *calculateEigenValues(double **ATA)
