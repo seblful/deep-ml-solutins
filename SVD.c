@@ -78,6 +78,31 @@ double **calculateEigenVectors(double **ATA, double *lambdas)
     return vectors;
 }
 
+double **compute_U(double **A, double **V)
+{
+    double **U = allocateMatrix(SIZE, SIZE);
+    for (int i = 0; i < SIZE; i++)
+    {
+        for (int j = 0; j < SIZE; j++)
+        {
+
+            U[j][i] = (A[j][0] * V[i][0]) + (A[j][1] * V[i][1]);
+        }
+    }
+
+    // Transpose and normalize
+    double **TU = transposeMatrix(U, SIZE, SIZE);
+    for (int i = 0; i < SIZE; i++)
+    {
+        normalize(TU[i]);
+    };
+
+    // Free memory
+    freeMatrix(U, SIZE);
+
+    return TU;
+}
+
 SVDResult decomposeMatrix(double **A, int rows, int cols)
 {
     // Product of original and transpose matrix
@@ -91,10 +116,10 @@ SVDResult decomposeMatrix(double **A, int rows, int cols)
     double *lambdas = calculateEigenValues(ATA);
     double **vectors = calculateEigenVectors(ATA, lambdas);
 
-    // Allocate memory for matrices
-    double **U = allocateMatrix(SIZE, SIZE);
+    // Allocate memory and declare
     double **S = allocateMatrix(SIZE, SIZE);
-    double **V = allocateMatrix(SIZE, SIZE);
+    double **V = (double **)malloc(SIZE * sizeof(double *));
+    double **U;
 
     // Compute S
     for (int i = 0; i < SIZE; i++)
@@ -105,10 +130,18 @@ SVDResult decomposeMatrix(double **A, int rows, int cols)
     // Compute V
     V = vectors;
 
+    // Compute U
+    U = compute_U(A, V);
+
     // Fill result
     SVDResult result;
+    result.U = U;
     result.S = S;
     result.V = V;
+
+    // Free memory
+    freeMatrix(ATA, SIZE);
+    free(lambdas);
 
     return result;
 }
@@ -130,10 +163,18 @@ int main()
     SVDResult result = decomposeMatrix(A, SIZE, SIZE);
 
     // Print results
+    printf("Matrix U with %d rows and %d cols.\n", SIZE, SIZE);
+    printMatrix(result.U, SIZE, SIZE, 4);
     printf("Matrix S with %d rows and %d cols.\n", SIZE, SIZE);
     printMatrix(result.S, SIZE, SIZE, 4);
     printf("Matrix V with %d rows and %d cols.\n", SIZE, SIZE);
     printMatrix(result.V, SIZE, SIZE, 4);
+
+    // Free memory
+    freeMatrix(A, SIZE);
+    freeMatrix(result.U, SIZE);
+    freeMatrix(result.S, SIZE);
+    freeMatrix(result.V, SIZE);
 
     return 0;
 }
