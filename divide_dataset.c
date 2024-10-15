@@ -3,11 +3,67 @@
 
 #include "utils.h"
 
+typedef struct divideResult
+{
+    double **first;
+    size_t firstRows;
+    double **second;
+    size_t secondRows;
+} divideResult;
+
+double findSplitRow(double **X, int rows, int cols, size_t iFeauture, int threshold)
+{
+    double nSplit;
+    for (int i = 0; i < rows; i++)
+    {
+        if (X[i][iFeauture] == threshold)
+        {
+            nSplit = i;
+            return nSplit;
+        };
+    }
+    return 0;
+}
+
+double **createSplit(double **X, int subsetSize, int start, int end)
+{
+    // Allocate memory for subset
+    double **subset = (double **)malloc(subsetSize * sizeof(double *));
+
+    size_t index = 0;
+    for (int i = start; i < end; i++)
+    {
+        subset[index] = X[i];
+        index += 1;
+    };
+
+    return subset;
+}
+
+divideResult divideDataset(double **X, int rows, int cols, size_t iFeauture, int threshold)
+{
+    // Find number of row to split
+    int nSplit = findSplitRow(X, rows, cols, iFeauture, threshold);
+
+    // Split data
+    double **first = createSplit(X, nSplit, 0, nSplit);
+    double **second = createSplit(X, rows - nSplit, nSplit, rows);
+
+    // Fill divideResult
+    divideResult result;
+    result.first = first;
+    result.firstRows = nSplit;
+    result.second = second;
+    result.secondRows = rows - nSplit;
+
+    return result;
+}
+
 int main()
 {
     // Init variavles
-    size_t feature_i = 0;
-    size_t threshold = 5;
+    size_t iFeauture = 0;
+    int threshold = 5;
 
     // Init X
     size_t rows = 5, cols = 2;
@@ -24,4 +80,13 @@ int main()
 
     printf("Matrix X with %d rows and %d cols.\n", rows, cols);
     printMatrix(X, rows, cols, 0);
+
+    // Divide dataset
+    divideResult result = divideDataset(X, rows, cols, iFeauture, threshold);
+
+    // Print result
+    printf("Matrix first with %d rows and %d cols.\n", result.firstRows, cols);
+    printMatrix(result.first, result.firstRows, cols, 0);
+    printf("Matrix second with %d rows and %d cols.\n", result.secondRows, cols);
+    printMatrix(result.second, result.secondRows, cols, 0);
 }
