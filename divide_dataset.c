@@ -59,6 +59,32 @@ divideResult divideDataset(double **X, int rows, int cols, size_t iFeauture, int
     return result;
 }
 
+void freeDivideResult(divideResult *result)
+{
+    if (result == NULL)
+    {
+        return;
+    }
+
+    // Free the first matrix
+    if (result->first != NULL)
+    {
+        free(result->first);
+        result->first = NULL;
+    }
+
+    // Free the second matrix
+    if (result->second != NULL)
+    {
+        free(result->second);
+        result->second = NULL;
+    }
+
+    // Reset the row counts
+    result->firstRows = 0;
+    result->secondRows = 0;
+}
+
 int main()
 {
     // Init variavles
@@ -89,4 +115,8 @@ int main()
     printMatrix(result.first, result.firstRows, cols, 0);
     printf("Matrix second with %d rows and %d cols.\n", result.secondRows, cols);
     printMatrix(result.second, result.secondRows, cols, 0);
+
+    // Free memory
+    freeMatrix(X, rows);
+    freeDivideResult(&result);
 }
