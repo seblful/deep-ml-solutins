@@ -70,6 +70,40 @@ void printBatches(BatchIterator batches)
     };
 }
 
+void freeBatchIterator(BatchIterator *batches)
+{
+    if (batches == NULL)
+    {
+        return;
+    }
+
+    // Free the 3D data array
+    if (batches->data != NULL)
+    {
+        for (int i = 0; i < batches->numBatches; i++)
+        {
+            if (batches->data[i] != NULL)
+            {
+                free(batches->data[i]);
+            }
+        }
+        free(batches->data);
+    }
+
+    // Free the 2D result array
+    if (batches->result != NULL)
+    {
+        for (int i = 0; i < batches->numBatches; i++)
+        {
+            if (batches->result[i] != NULL)
+            {
+                free(batches->result[i]);
+            }
+        }
+        free(batches->result);
+    }
+}
+
 int main()
 {
     // Init X
@@ -112,8 +146,7 @@ int main()
     // Free memory
     freeMatrix(X, rows);
     free(y);
-    free(batches.data);
-    free(batches.result);
+    freeBatchIterator(&batches);
 
     return 0;
 }
