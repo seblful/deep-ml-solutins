@@ -7,6 +7,7 @@ typedef struct BatchIterator
 {
     double ***data;
     double **result;
+    int numBatches;
     int batchSize;
     size_t rows;
     size_t cols;
@@ -42,11 +43,31 @@ BatchIterator createBatchIterator(double **X, double *y, size_t rows, size_t col
     BatchIterator batches;
     batches.data = data;
     batches.result = result;
+    batches.numBatches = numBatches;
     batches.batchSize = batchSize;
     batches.rows = rows;
     batches.cols = cols;
 
     return batches;
+}
+
+void printBatches(BatchIterator batches)
+{
+    // Iterate through batches and print them
+    for (int i = 0; i < (batches.rows + batches.batchSize - 1) / batches.batchSize; i++)
+    {
+        printf("Batch %d:\n", i);
+        for (int j = 0; j < batches.batchSize; j++)
+        {
+            if (batches.data[i][j] != NULL)
+            {
+                printf("Row %d data: ", i * batches.batchSize + j);
+                printMatrix(&batches.data[i][j], 1, batches.cols, 0);
+                printf("Row %d result: %0.0f\n", i * batches.batchSize + j, batches.result[i][j]);
+            }
+        }
+        printf("\n");
+    };
 }
 
 int main()
@@ -84,6 +105,15 @@ int main()
 
     // Create batches
     BatchIterator batches = createBatchIterator(X, y, rows, cols, batchSize);
+
+    // Print batches
+    printBatches(batches);
+
+    // Free memory
+    freeMatrix(X, rows);
+    free(y);
+    free(batches.data);
+    free(batches.result);
 
     return 0;
 }
