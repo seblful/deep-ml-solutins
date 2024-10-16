@@ -58,7 +58,7 @@ subsetResult subsetDataset(double **X, size_t rows, size_t cols, double *y, int 
 
     // Allocate memory for X and y
     double **subsetX = (double **)malloc(nSubsets * sizeof(double *));
-    double *subsetY;
+    double *subsetY = (double *)malloc(nSubsets * sizeof(double));
 
     // Fill subsets
     for (int i = 0; i < nSubsets; i++)
@@ -109,6 +109,9 @@ int main()
         y[i] = init_y[i];
     };
 
+    printf("Vector y with size %d.\n", rows);
+    printVector(y, rows, 0);
+
     // Subset
     subsetResult result = subsetDataset(X, rows, cols, y, nSubsets, replacements);
 
@@ -123,4 +126,5 @@ int main()
     freeMatrix(X, rows);
     free(y);
     free(result.X);
+    free(result.y);
 }
