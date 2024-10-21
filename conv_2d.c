@@ -49,9 +49,6 @@ convResult performConvolution(double **X, size_t xSize, double **K, size_t kSize
         padX = X;
     }
 
-    printMatrix(padX, padSize, padSize, 0);
-    printf("%d\n", padSize);
-
     // Perform convolution
     size_t convSize = ((xSize - kSize + 2 * padding) / stride) + 1;
 
@@ -129,6 +126,7 @@ int main()
 
     // Perform convolution
     convResult result = performConvolution(X, xSize, K, kSize, padding, stride);
+    printf("Matrix convX with %zu rows and %zu cols.\n", result.size, result.size);
     printMatrix(result.data, result.size, result.size, 1);
 
     // Free memory
