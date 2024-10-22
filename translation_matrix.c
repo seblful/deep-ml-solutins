@@ -32,11 +32,30 @@ double **createTransMatrix(double tx, double ty)
     return transMatrix;
 }
 
+// Function to translate points using the translation matrix
 double **translateMatrix(double **points, size_t rows, size_t cols, double tx, double ty)
 {
-    // Create translation matrix;
     double **transMatrix = createTransMatrix(tx, ty);
-    printMatrix(transMatrix, SIZE, SIZE, 2);
+    double **resultPoints = allocateMatrix(rows, cols); // Resulting points
+
+    for (int i = 0; i < rows; i++)
+    {
+        double tempPoints[SIZE];
+        tempPoints[0] = points[i][0];
+        tempPoints[1] = points[i][1];
+        tempPoints[2] = 1;
+
+        double tempDot[SIZE];
+        matrixVectorDotProduct(transMatrix, SIZE, SIZE, tempPoints, SIZE, tempDot);
+
+        resultPoints[i][0] = tempDot[0]; // x'
+        resultPoints[i][1] = tempDot[1]; // y'
+    }
+
+    // Free translation matrix memory
+    freeMatrix(transMatrix, SIZE);
+
+    return resultPoints;
 }
 
 int main()
@@ -60,6 +79,12 @@ int main()
 
     // Translate matrix
     double **result = translateMatrix(points, rows, cols, tx, ty);
+    printf("Matrix result with %zu rows and %zu cols.\n", rows, cols);
+    printMatrix(result, rows, cols, 2);
+
+    // Free memory
+    freeMatrix(points, rows);
+    freeMatrix(result, rows);
 
     return 0;
 }
