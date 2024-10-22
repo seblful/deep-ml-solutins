@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-double relu(float x)
+double relu(double x)
 {
     if (x > 0)
     {
