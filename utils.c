@@ -70,6 +70,22 @@ double *matrixVectorMultiply(double **M, int rows, int cols, double *v, int n, d
     return result;
 };
 
+void matrixVectorDotProduct(double **M, size_t rows, size_t cols, double *v, int n, double *result)
+
+{
+    // Assert if wrong size of matrix or vector
+    assert(cols == n); // Vector size n should be the same as number of matrix cols."
+
+    for (int i = 0; i < rows; i++)
+    {
+        result[i] = 0;
+        for (int j = 0; j < cols; j++)
+        {
+            result[i] += M[i][j] * v[j];
+        }
+    }
+}
+
 void matrixMultiply(double **A, int rowsA, int colsA, double **B, int rowsB, int colsB, double **C)
 {
     // Check if multiplication is possible
