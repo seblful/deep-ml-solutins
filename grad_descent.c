@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <assert.h>
 
 #include "utils.h"
 
@@ -31,29 +32,45 @@ double *gradDescent(double **X,
                     char method[])
 {
 
-    // Declare variables
-    double *yPred = (double *)malloc(rows * sizeof(double));
-    double *errors = (double *)malloc(rows * sizeof(double));
+    // Declare gradients
+    double *gradient = (double *)malloc(cols * sizeof(double));
 
     for (int i = 0; i < nIterations; i++)
     {
 
         if (strcmp(method, "batch") == 0)
         {
-            // Predict and find error
+            // Allocate memory for vectors
+            double *yPred = (double *)malloc(rows * sizeof(double));
+            double *errors = (double *)malloc(rows * sizeof(double));
+
+            // Calculate yPred and find error
             matrixVectorDotProduct(X, rows, cols, weights, cols, yPred);
             calculateErrors(yTrue, yPred, rows, errors);
 
             // Calculate gradient
             double **X_T = transposeMatrix(X, rows, cols);
-            double *gradient = (double *)malloc(cols * sizeof(double));
             matrixVectorDotProduct(X_T, cols, rows, errors, rows, gradient);
-            scalarVectorMultiply(gradient, cols, 2 / (double)rows);
+            scalarVectorMultiply(gradient, cols, 2 / (double)rows, gradient);
 
             // Update weights
             updateWeights(weights, gradient, cols, lr);
-            ;
-        };
+        }
+
+        else if (strcmp(method, "stochastic") == 0)
+        {
+            // Declare variables
+            double prediction;
+            double error;
+
+            for (int j = 0; j < rows; j++)
+            {
+                prediction = vectorDotProduct(X[j], cols, weights, cols);
+                error = prediction - yTrue[j];
+                scalarVectorMultiply(X[j], cols, 2 * error, gradient);
+                updateWeights(weights, gradient, cols, lr);
+            };
+        }
     }
 
     return weights;
@@ -63,9 +80,9 @@ int main()
 {
     // Parameters
     double learning_rate = 0.01;
-    int nIterations = 1000;
+    int nIterations = 1;
     int batchSize = 2;
-    char method[] = "batch";
+    char method[] = "stochastic";
 
     // Init X
     size_t rows = 4, cols = 2;
@@ -101,7 +118,7 @@ int main()
     // Gradient descent
     double *updWeights = gradDescent(X, rows, cols, y, weights, learning_rate, nIterations, batchSize, method);
     printf("Vector updWeights with size %zu.\n", cols);
-    printVector(updWeights, cols, 2);
+    printVector(updWeights, cols, 10);
 
     return 0;
 }
