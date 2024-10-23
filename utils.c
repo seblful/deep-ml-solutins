@@ -53,6 +53,22 @@ void print3DMatrix(double ***m, int x, int y, int z, int precision)
     return;
 };
 
+void scalarVectorMultiply(double *v, size_t n, double value)
+{
+    for (int i = 0; i < n; i++)
+    {
+        v[i] *= value;
+    }
+}
+
+void scalarVectorDivision(double *v, size_t n, double value)
+{
+    for (int i = 0; i < n; i++)
+    {
+        v[i] /= value;
+    }
+}
+
 double *matrixVectorMultiply(double **M, int rows, int cols, double *v, int n, double *result)
 {
     // Assert if wrong size of matrix or vector

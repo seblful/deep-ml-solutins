@@ -16,6 +16,8 @@ double ***allocate3dMatrix(int x, int y, int z);
 void freeMatrix(double **matrix, int rows);
 void free3dMatrix(double ***arr, int x, int y);
 
+void scalarVectorMultiply(double *v, size_t n, double value);
+void scalarVectorDivision(double *v, size_t n, double value);
 double *matrixVectorMultiply(double **M, int rows, int cols, double *v, int n, double *result);
 void matrixVectorDotProduct(double **M, size_t rows, size_t cols, double *v, int n, double *result);
 void matrixMultiply(double **A, int rowsA, int colsA, double **B, int rowsB, int colsB, double **C);
