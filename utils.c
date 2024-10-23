@@ -53,23 +53,23 @@ void print3DMatrix(double ***m, int x, int y, int z, int precision)
     return;
 };
 
-void scalarVectorMultiply(double *v, size_t n, double value)
+void scalarVectorMultiply(double *v, size_t n, double value, double *result)
 {
     for (int i = 0; i < n; i++)
     {
-        v[i] *= value;
+        result[i] = v[i] * value;
     }
 }
 
-void scalarVectorDivision(double *v, size_t n, double value)
+void scalarVectorDivision(double *v, size_t n, double value, double *result)
 {
     for (int i = 0; i < n; i++)
     {
-        v[i] /= value;
+        result[i] = v[i] / value;
     }
 }
 
-double *matrixVectorMultiply(double **M, int rows, int cols, double *v, int n, double *result)
+void matrixVectorMultiply(double **M, int rows, int cols, double *v, int n, double *result)
 {
     // Assert if wrong size of matrix or vector
     assert(cols == n); // Vector size n should be the same as number of matrix cols."
@@ -83,7 +83,6 @@ double *matrixVectorMultiply(double **M, int rows, int cols, double *v, int n, d
             result[i] += M[i][j] * v[j];
         }
     }
-    return result;
 };
 
 void matrixVectorDotProduct(double **M, size_t rows, size_t cols, double *v, int n, double *result)
