@@ -69,6 +69,18 @@ void scalarVectorDivision(double *v, size_t n, double value, double *result)
     }
 }
 
+double vectorDotProduct(double *v1, size_t n1, double *v2, size_t n2)
+{
+    assert(n1 == n2); // Vector size n1 should be the same as vector size n2."
+
+    double product = 0;
+    for (int i = 0; i < n1; i++)
+    {
+        product += v1[i] * v2[i];
+    }
+    return product;
+}
+
 void matrixVectorMultiply(double **M, int rows, int cols, double *v, int n, double *result)
 {
     // Assert if wrong size of matrix or vector
