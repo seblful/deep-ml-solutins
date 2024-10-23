@@ -55,6 +55,11 @@ double *gradDescent(double **X,
 
             // Update weights
             updateWeights(weights, gradient, cols, lr);
+
+            // Free allocated memory
+            free(yPred);
+            free(errors);
+            freeMatrix(X_T, cols);
         }
 
         else if (strcmp(method, "stochastic") == 0)
@@ -71,7 +76,38 @@ double *gradDescent(double **X,
                 updateWeights(weights, gradient, cols, lr);
             };
         }
+
+        else if (strcmp(method, "mini_batch") == 0)
+        {
+            for (int j = 0; j < rows; j += batchSize)
+            {
+                int currentBatchSize = (j + batchSize > rows) ? rows - j : batchSize;
+
+                // Allocate memory for vectors
+                double *yPred = (double *)malloc(currentBatchSize * sizeof(double));
+                double *errors = (double *)malloc(currentBatchSize * sizeof(double));
+
+                // Calculate yPred and find error for the mini-batch
+                matrixVectorDotProduct(X + j, currentBatchSize, cols, weights, cols, yPred);
+                calculateErrors(yTrue + j, yPred, currentBatchSize, errors);
+
+                // Calculate gradient
+                double **X_T = transposeMatrix(X + j, currentBatchSize, cols);
+                matrixVectorDotProduct(X_T, cols, currentBatchSize, errors, currentBatchSize, gradient);
+                scalarVectorMultiply(gradient, cols, 2 / (double)currentBatchSize, gradient);
+
+                // Update weights
+                updateWeights(weights, gradient, cols, lr);
+
+                // Free allocated memory
+                free(yPred);
+                free(errors);
+                freeMatrix(X_T, cols);
+            }
+        }
     }
+
+    free(gradient);
 
     return weights;
 }
@@ -80,9 +116,9 @@ int main()
 {
     // Parameters
     double learning_rate = 0.01;
-    int nIterations = 1;
+    int nIterations = 1000;
     int batchSize = 2;
-    char method[] = "stochastic";
+    char method[] = "mini_batch";
 
     // Init X
     size_t rows = 4, cols = 2;
@@ -118,7 +154,12 @@ int main()
     // Gradient descent
     double *updWeights = gradDescent(X, rows, cols, y, weights, learning_rate, nIterations, batchSize, method);
     printf("Vector updWeights with size %zu.\n", cols);
-    printVector(updWeights, cols, 10);
+    printVector(updWeights, cols, 8);
+
+    // Free memory
+    freeMatrix(X, rows);
+    free(y);
+    free(weights);
 
     return 0;
 }
