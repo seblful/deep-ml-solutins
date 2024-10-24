@@ -5,6 +5,30 @@
 
 #include "utils.h"
 
+double *calculateMean(double **X, size_t rows, size_t cols, char *mode)
+{
+    // Find Mode
+    bool isRowsMode = strcmp(mode, "row") == 0;
+    size_t first = isRowsMode ? rows : cols;
+    size_t second = isRowsMode ? cols : rows;
+
+    // Allocate memory
+    double *mean = (double *)malloc(first * sizeof(double));
+
+    for (int i = 0; i < first; i++)
+    {
+        double sum = 0;
+        for (int j = 0; j < second; j++)
+        {
+
+            sum += isRowsMode ? X[i][j] : X[j][i];
+        }
+        mean[i] = sum / first;
+    }
+
+    return mean;
+}
+
 int main()
 {
     // Init X
