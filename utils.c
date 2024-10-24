@@ -81,6 +81,28 @@ double vectorDotProduct(double *v1, size_t n1, double *v2, size_t n2)
     return product;
 }
 
+void scalarMatrixMultiply(double **M, size_t rows, size_t cols, double value, double **result)
+{
+    for (int i = 0; i < rows; i++)
+    {
+        for (int j = 0; j < cols; j++)
+        {
+            result[i][j] = M[i][j] * value;
+        }
+    };
+}
+
+void scalarMatrixDivision(double **M, size_t rows, size_t cols, double value, double **result)
+{
+    for (int i = 0; i < rows; i++)
+    {
+        for (int j = 0; j < cols; j++)
+        {
+            result[i][j] = M[i][j] / value;
+        }
+    };
+}
+
 void matrixVectorMultiply(double **M, int rows, int cols, double *v, int n, double *result)
 {
     // Assert if wrong size of matrix or vector

@@ -19,6 +19,8 @@ void free3dMatrix(double ***arr, int x, int y);
 void scalarVectorMultiply(double *v, size_t n, double value, double *result);
 void scalarVectorDivision(double *v, size_t n, double value, double *result);
 double vectorDotProduct(double *v1, size_t n1, double *v2, size_t n2);
+void scalarMatrixMultiply(double **M, size_t rows, size_t cols, double value, double **result);
+void scalarMatrixDivision(double **M, size_t rows, size_t cols, double value, double **result);
 void matrixVectorMultiply(double **M, int rows, int cols, double *v, int n, double *result);
 void matrixVectorDotProduct(double **M, size_t rows, size_t cols, double *v, int n, double *result);
 void matrixMultiply(double **A, int rowsA, int colsA, double **B, int rowsB, int colsB, double **C);
