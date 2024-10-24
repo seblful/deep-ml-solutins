@@ -3,6 +3,58 @@
 
 #include "utils.h"
 
+void rref(double **M, size_t rows, size_t cols)
+{
+    size_t lead = 0;
+
+    for (size_t r = 0; r < rows; r++)
+    {
+        if (lead >= cols)
+            return;
+
+        // Find the pivot row
+        size_t i = r;
+        while (M[i][lead] == 0)
+        {
+            i++;
+            if (i == rows)
+            {
+                i = r;
+                lead++;
+                if (lead == cols)
+                    return;
+            }
+        }
+
+        // Swap the current row with the pivot row
+        double *temp = M[r];
+        M[r] = M[i];
+        M[i] = temp;
+
+        // Normalize the pivot row
+        double divisor = M[r][lead];
+        for (size_t j = 0; j < cols; j++)
+        {
+            M[r][j] /= divisor;
+        }
+
+        // Eliminate all other entries in this column
+        for (size_t k = 0; k < rows; k++)
+        {
+            if (k != r)
+            {
+                double factor = M[k][lead];
+                for (size_t j = 0; j < cols; j++)
+                {
+                    M[k][j] -= factor * M[r][j];
+                }
+            }
+        }
+
+        lead++;
+    }
+}
+
 int main()
 {
     // Init M
