@@ -4,11 +4,27 @@
 
 #include "utils.h"
 
-void addBias(double *y, double *bias, size_t n)
+double sign(double x)
+{
+    if (x < 0)
+    {
+        return -1;
+    }
+    else if (x == 0)
+    {
+        return 0;
+    }
+    else
+    {
+        return 1;
+    }
+}
+
+void addBias(double *y, double bias, size_t n)
 {
     for (int i = 0; i < n; i++)
     {
-        y[i] += bias[i];
+        y[i] += bias;
     };
 }
 
@@ -16,7 +32,7 @@ void calculateError(double *yTrue, double *yPred, double *errors, size_t n)
 {
     for (int i = 0; i < n; i++)
     {
-        errors[i] = yTrue[i] - yPred[i];
+        errors[i] = yPred[i] - yTrue[i];
     };
 }
 
@@ -29,9 +45,10 @@ void updateWeights(double **X, size_t rows, size_t cols, double *errors, double 
         {
             gradient += X[i][j] * errors[i];
         }
-        // Apply Lasso regularization: add alpha * sign(weights[j])
-        double lasso_penalty = alpha * (weights[j] > 0 ? 1 : -1);
-        weights[j] += lr * (gradient - lasso_penalty);
+
+        // Apply Lasso regularization
+        gradient = (gradient / (double)rows) + alpha * sign(weights[j]);
+        weights[j] -= lr * gradient;
     }
 }
 
@@ -42,23 +59,24 @@ void updateBias(double *bias, double *errors, size_t n, double lr)
     {
         bias_gradient += errors[i];
     }
+    bias_gradient /= n;
+
     // Update bias
-    *bias += lr * bias_gradient / n; // Average gradient
+    *bias -= lr * bias_gradient;
 }
 
 void *lassoRegression(double **X, size_t rows, size_t cols, double *yTrue, double *weights, double alpha, double lr, int nIterations)
 {
     // Allocate memory
-
     double bias = 0;
     double *yPred = (double *)calloc(rows, sizeof(double));
     double *errors = (double *)calloc(rows, sizeof(double));
 
-    for (int i = 0; i < nIterations; i++)
+    for (int iter = 0; iter < nIterations; iter++)
     {
         // Pred y and calculate errors
         matrixVectorMultiply(X, rows, cols, weights, cols, yPred);
-        addBias(yPred, &bias, rows); // Pass address of bias
+        addBias(yPred, bias, rows); // Pass address of bias
         calculateError(yTrue, yPred, errors, rows);
 
         // Update weights and biases
@@ -66,17 +84,18 @@ void *lassoRegression(double **X, size_t rows, size_t cols, double *yTrue, doubl
         updateBias(&bias, errors, rows, lr);
     }
 
+    // Free memory
     free(yPred);
     free(errors);
 
-    return weights; // Returning weights for further use
+    return weights;
 }
 
 int main()
 {
     double alpha = 0.1;
     double lr = 0.01;
-    int nIterations = 1000;
+    int nIterations = 100;
     size_t rows = 3, cols = 2;
 
     // Init X
