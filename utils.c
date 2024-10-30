@@ -43,6 +43,19 @@ void printMatrix(double **m, int rows, int cols, int precision)
     return;
 };
 
+void printIntMatrix(int **m, int rows, int cols)
+{
+    for (int i = 0; i < rows; i++)
+    {
+        for (int j = 0; j < cols; j++)
+        {
+            printf("%d ", m[i][j]);
+        }
+        printf("\n");
+    }
+    return;
+};
+
 void print3DMatrix(double ***m, int x, int y, int z, int precision)
 {
     for (int i = 0; i < x; i++)
