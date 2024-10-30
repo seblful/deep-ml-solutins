@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 
 #include "utils.h"
 
@@ -9,6 +10,37 @@ typedef struct QKVResult
     double **K;
     double **V;
 } QKVResult;
+
+void softmax(double **matrix, int rows, int cols)
+{
+    for (int i = 0; i < rows; i++)
+    {
+        double max_val = matrix[i][0];
+
+        // Find maximum value in the row for numerical stability
+        for (int j = 1; j < cols; j++)
+        {
+            if (matrix[i][j] > max_val)
+            {
+                max_val = matrix[i][j];
+            }
+        }
+
+        double sum_exp = 0.0;
+
+        // Calculate the sum of exponentials
+        for (int j = 0; j < cols; j++)
+        {
+            sum_exp += exp(matrix[i][j] - max_val); // Subtract max_val for numerical stability
+        }
+
+        // Apply softmax to each element in the row
+        for (int j = 0; j < cols; j++)
+        {
+            matrix[i][j] = exp(matrix[i][j] - max_val) / sum_exp;
+        }
+    }
+}
 
 QKVResult computeQKV(double **X, double **Wq, double **Wk, double **Wv, size_t size)
 {
@@ -27,10 +59,22 @@ QKVResult computeQKV(double **X, double **Wq, double **Wk, double **Wv, size_t s
     return result;
 }
 
-double selfAttention(double **X, double **Wq, double **Wk, double **Wv, size_t size)
+double **selfAttention(double **X, double **Wq, double **Wk, double **Wv, size_t size)
 {
     // Compute QKV
     QKVResult qkv = computeQKV(X, Wq, Wk, Wv, size);
+
+    // Transpose K
+    double **K_T = transposeMatrix(qkv.K, size, size);
+
+    // Calculate attention
+    double **QK_T = allocateMatrix(size, size);
+    double **A = allocateMatrix(size, size);
+
+    matrixMultiply(qkv.Q, size, size, K_T, size, size, QK_T);
+    scalarMatrixDivision(QK_T, size, size, sqrt(size), QK_T);
+    softmax(QK_T, size, size);
+    matrixMultiply(QK_T, size, size, qkv.V, size, size, A);
 }
 
 int main()
@@ -67,7 +111,7 @@ int main()
     printf("Matrix Wv with %d rows and %d cols.\n", size, size);
     printMatrix(Wv, size, size, 0);
 
-    double result = selfAttention(X, Wq, Wk, Wv, size);
+    double **A = selfAttention(X, Wq, Wk, Wv, size);
 
     // Free memory
 
