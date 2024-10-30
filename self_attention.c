@@ -75,6 +75,15 @@ double **selfAttention(double **X, double **Wq, double **Wk, double **Wv, size_t
     scalarMatrixDivision(QK_T, size, size, sqrt(size), QK_T);
     softmax(QK_T, size, size);
     matrixMultiply(QK_T, size, size, qkv.V, size, size, A);
+
+    // Free memory
+    freeMatrix(qkv.Q, size);
+    freeMatrix(qkv.K, size);
+    freeMatrix(qkv.V, size);
+    freeMatrix(K_T, size);
+    freeMatrix(QK_T, size);
+
+    return A;
 }
 
 int main()
@@ -112,8 +121,15 @@ int main()
     printMatrix(Wv, size, size, 0);
 
     double **A = selfAttention(X, Wq, Wk, Wv, size);
+    printf("Matrix A with %d rows and %d cols.\n", size, size);
+    printMatrix(A, size, size, 7);
 
     // Free memory
+    freeMatrix(X, size);
+    freeMatrix(Wq, size);
+    freeMatrix(Wk, size);
+    freeMatrix(Wv, size);
+    freeMatrix(A, size);
 
     return 0;
 }
