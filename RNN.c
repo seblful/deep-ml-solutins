@@ -1,7 +1,17 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 
 #include "utils.h"
+
+void *RNNForward(double **X, size_t rows, size_t cols, double Wx, double Wh, double *h, double b)
+{
+    for (int i = 0; i < rows; i++)
+    {
+        h[i + 1] = tanh(Wx * X[i][0] + Wh * h[i] + b);
+        printf("H %f.\n", h[i + 1]);
+    }
+}
 
 int main()
 {
@@ -22,25 +32,25 @@ int main()
     printMatrix(X, rows, cols, 0);
 
     // Init Ws, h and b
-    double **Wx = allocateMatrix(cols, cols);
-    double **Wh = allocateMatrix(cols, cols);
-    double *h = (double *)calloc(rows, sizeof(double));
-    double *b = (double *)malloc(cols * sizeof(double));
+    double Wx = 0.5;
+    double Wh = 0.8;
 
-    Wx[0][0] = 0.5;
-    Wh[0][0] = 0.8;
-    h[0] = 0;
-    b[0] = 0;
+    double *h = (double *)calloc(rows + 1, sizeof(double));
 
-    printf("Matrix Wx with %zu rows and %zu cols.\n", cols, cols);
-    printMatrix(Wx, cols, cols, 0);
-    printf("Matrix Wh with %zu rows and %zu cols.\n", cols, cols);
-    printMatrix(Wh, cols, cols, 0);
+    double b = 0;
 
-    printf("Vector h with size %d.\n", rows);
-    printVector(h, rows, 0);
-    printf("Vector b with size %d.\n", cols);
-    printVector(b, cols, 0);
+    printf("Wx is %f.\n", Wx);
+    printf("Wh is %f.\n", Wh);
+    printf("Vector h with size %d.\n", rows + 1);
+    printVector(h, rows + 1, 0);
+    printf("Bias is %0.2f.\n", b);
+
+    RNNForward(X, rows, cols, Wx, Wh, h, b);
+
+    printf("The final hidden state is approximately %f.\n", h[rows]);
+
+    // Free memory
+    freeMatrix(X, rows);
 
     return 0;
 }
