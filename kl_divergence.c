@@ -4,14 +4,16 @@
 
 #include "utils.h"
 
-double square(x)
+double square(double x)
 {
     return x * x;
 }
 
 double calculateKLDivergence(double pMu, double pSigma, double qMu, double qSigma)
 {
-    ;
+    double div = log(qSigma / pSigma) + ((square(pSigma) + square(pMu - qMu)) / 2 * square(qSigma)) - 0.5;
+
+    return div;
 }
 
 int main()
@@ -24,5 +26,8 @@ int main()
 
     // Calculate KL divergence
     double div = calculateKLDivergence(pMu, pSigma, qMu, qSigma);
+
+    printf("KL Divergence is %f.\n", div);
+
     return 0;
 }
