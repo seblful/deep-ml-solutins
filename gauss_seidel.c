@@ -3,9 +3,28 @@
 
 #include "utils.h"
 
-double gaussSeidelIt(double **A, double *b, int n)
+void gaussSeidelIt(double **A, size_t rows, size_t cols, double *b, double *x)
 {
-    ;
+    for (size_t i = 0; i < rows; i++)
+    {
+        double sum = b[i];
+        for (size_t j = 0; j < cols; j++)
+        {
+            if (i != j)
+            {
+                sum -= A[i][j] * x[j];
+            }
+        }
+        x[i] = sum / A[i][i];
+    }
+}
+
+void gaussSeidel(double **A, size_t rows, size_t cols, double *b, int iterations, double *x)
+{
+    for (int k = 0; k < iterations; k++)
+    {
+        gaussSeidelIt(A, rows, cols, b, x);
+    }
 }
 
 int main()
@@ -40,6 +59,20 @@ int main()
     printVector(b, cols, 0);
 
     int n = 100;
+
+    // Allocate memory for initial guess
+    double *x = (double *)calloc(cols, sizeof(double));
+
+    // Perform Gauss-Seidel iteration
+    gaussSeidel(A, rows, cols, b, n, x);
+
+    printf("Approximated solution after %d iterations:\n", n);
+    printVector(x, cols, 2);
+
+    // Free memory
+    freeMatrix(A, rows);
+    free(b);
+    free(x);
 
     return 0;
 }
