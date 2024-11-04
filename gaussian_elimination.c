@@ -36,6 +36,32 @@ void gaussianElimination(double **A, size_t rows, size_t cols, double *b, double
         A[i] = realloc(A[i], (cols + 1) * sizeof(double));
         A[i][cols] = b[i]; // Add b as the last column
     }
+
+    // Perform Gaussian elimination
+    for (size_t i = 0; i < rows - 1; i++)
+    {
+        partialPivoting(A, rows, i, i);
+
+        for (size_t j = i + 1; j < rows; j++)
+        {
+            double factor = A[j][i] / A[i][i];
+            for (size_t k = i; k <= cols; k++)
+            {
+                A[j][k] -= factor * A[i][k];
+            }
+        }
+    }
+
+    // Back substitution
+    for (int i = rows - 1; i >= 0; i--)
+    {
+        result[i] = A[i][cols]; // Start with the last column value
+        for (size_t j = i + 1; j < cols; j++)
+        {
+            result[i] -= A[i][j] * result[j];
+        }
+        result[i] /= A[i][i]; // Divide by the diagonal element
+    }
 }
 
 int main()
@@ -75,6 +101,11 @@ int main()
 
     printf("Vector result with size %zu.\n", cols);
     printVector(result, cols, 2);
+
+    // Free memory
+    freeMatrix(A, rows);
+    free(b);
+    free(result);
 
     return 0;
 }
