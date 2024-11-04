@@ -1,11 +1,41 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 
 #include "utils.h"
 
+void partialPivoting(double **A, size_t rows, size_t row_num, size_t col_num)
+{
+    size_t max_row = row_num;
+    double max_val = fabs(A[row_num][col_num]);
+
+    for (size_t i = row_num; i < rows; i++)
+    {
+        double current_val = fabs(A[i][col_num]);
+        if (current_val > max_val)
+        {
+            max_val = current_val;
+            max_row = i;
+        }
+    }
+
+    // Swap rows if necessary
+    if (max_row != row_num)
+    {
+        double *temp = A[row_num];
+        A[row_num] = A[max_row];
+        A[max_row] = temp;
+    }
+}
+
 void gaussianElimination(double **A, size_t rows, size_t cols, double *b, double *result)
 {
-    ;
+    // Augment the matrix A with vector b
+    for (size_t i = 0; i < rows; i++)
+    {
+        A[i] = realloc(A[i], (cols + 1) * sizeof(double));
+        A[i][cols] = b[i]; // Add b as the last column
+    }
 }
 
 int main()
