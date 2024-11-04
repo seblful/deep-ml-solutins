@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 #include <string.h>
 #include <stdbool.h>
 
@@ -23,10 +24,12 @@ double *calculateTf(char corpus[SENTENCES][WORDS_PER_SENTENCE][WORD_LENGTH],
         for (int j = 0; j < WORDS_PER_SENTENCE; j++)
         {
 
-            if (corpus[i][j][0])
+            if (!corpus[i][j][0])
             {
-                wordCount += 1;
+                break;
             }
+
+            wordCount += 1;
 
             if (strcmp(corpus[i][j], query) == 0)
             {
@@ -43,7 +46,28 @@ double *calculateTf(char corpus[SENTENCES][WORDS_PER_SENTENCE][WORD_LENGTH],
 double calculateIdf(char corpus[SENTENCES][WORDS_PER_SENTENCE][WORD_LENGTH],
                     char query[WORD_LENGTH])
 {
-    ;
+    int sentCount = 0;
+
+    for (int i = 0; i < SENTENCES; i++)
+    {
+
+        for (int j = 0; j < WORDS_PER_SENTENCE; j++)
+        {
+
+            if (!corpus[i][j][0])
+            {
+                break;
+            }
+
+            if (strcmp(corpus[i][j], query) == 0)
+            {
+                sentCount += 1;
+                break;
+            }
+        }
+    }
+
+    return log10((double)SENTENCES / (double)sentCount);
 }
 
 double *calculateTfidf(char corpus[SENTENCES][WORDS_PER_SENTENCE][WORD_LENGTH],
@@ -51,8 +75,9 @@ double *calculateTfidf(char corpus[SENTENCES][WORDS_PER_SENTENCE][WORD_LENGTH],
 {
     double *tf = calculateTf(corpus, query);
     printf("Vector tf with size %zu.\n", SENTENCES);
-    printVector(tf, SENTENCES, 3);
-    double idf;
+    printVector(tf, SENTENCES, 4);
+    double idf = calculateIdf(corpus, query);
+    printf("IDF is %0.4f.\n", idf);
 
     // Allocate memory for tfidf
     double *tfidf = (double *)malloc(SENTENCES * sizeof(double));
@@ -87,7 +112,7 @@ int main()
     double *tfidf = calculateTfidf(corpus, query);
 
     printf("Vector tfidf with size %zu.\n", SENTENCES);
-    printVector(tfidf, SENTENCES, 3);
+    printVector(tfidf, SENTENCES, 4);
 
     // Free memory
 
