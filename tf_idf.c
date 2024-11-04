@@ -73,14 +73,22 @@ double calculateIdf(char corpus[SENTENCES][WORDS_PER_SENTENCE][WORD_LENGTH],
 double *calculateTfidf(char corpus[SENTENCES][WORDS_PER_SENTENCE][WORD_LENGTH],
                        char query[WORD_LENGTH])
 {
+    // Calculate tf and idf
     double *tf = calculateTf(corpus, query);
-    printf("Vector tf with size %zu.\n", SENTENCES);
+    printf("Vector TF with size %zu.\n", SENTENCES);
     printVector(tf, SENTENCES, 4);
     double idf = calculateIdf(corpus, query);
     printf("IDF is %0.4f.\n", idf);
 
-    // Allocate memory for tfidf
+    // Calculate tfidf
     double *tfidf = (double *)malloc(SENTENCES * sizeof(double));
+    for (int i = 0; i < SENTENCES; i++)
+    {
+        tfidf[i] = tf[i] * idf;
+    }
+
+    // Free memory
+    free(tf);
 
     return tfidf;
 }
@@ -111,10 +119,11 @@ int main()
 
     double *tfidf = calculateTfidf(corpus, query);
 
-    printf("Vector tfidf with size %zu.\n", SENTENCES);
+    printf("Vector TFIDF with size %zu.\n", SENTENCES);
     printVector(tfidf, SENTENCES, 4);
 
     // Free memory
+    free(tfidf);
 
     return 0;
 }
