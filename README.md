@@ -6,3 +6,5 @@ Solutions of tasks from <https://www.deep-ml.com> website
 
 * Implementing Basic Autograd Operations.
 * Implementing a Custom Dense Layer in Python
+* Implement Long Short-Term Memory (LSTM) Network
+* Implement a Simple RNN with Backpropagation Through Time (BPTT)
