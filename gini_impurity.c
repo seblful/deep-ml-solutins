@@ -79,12 +79,23 @@ double *calculateProbs(double *y, size_t ySize, double *classes, size_t classesS
 
 double giniImpurity(double *y, size_t size)
 {
+    // Find unique values
     set_t classesSet = createUniqueArray(y, size);
-    printf("SIZE CLASSES: %zu.\n", classesSet.size);
-    printVector(classesSet.classes, classesSet.size, 3);
-
+    // Calculate probabilities
     double *probs = calculateProbs(y, size, classesSet.classes, classesSet.size);
-    printVector(probs, classesSet.size, 3);
+
+    // Calculate Gini Impurity
+    double sum = 0;
+    for (int i = 0; i < classesSet.size; i++)
+    {
+        sum += probs[i] * probs[i];
+    }
+
+    // Free memory
+    free(classesSet.classes);
+    free(probs);
+
+    return 1 - sum;
 }
 
 int main()
@@ -103,6 +114,10 @@ int main()
 
     // Calculate Gini Impurity
     double impurity = giniImpurity(y, size);
+    printf("Gini Umpurity is %0.3f.\n", impurity);
+
+    // Free memory
+    free(y);
 
     return 0;
 }
