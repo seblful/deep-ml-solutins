@@ -15,15 +15,14 @@ typedef struct CSRResult
 CSRResult performCSR(double **A, size_t rows, size_t cols)
 {
     // Allocate memory for arrays
-    double *values = (double *)malloc(rows * sizeof(double));
-    double *colIds = (double *)malloc(rows * sizeof(double));
-    double *rowPointer = (double *)malloc(rows * sizeof(double));
+    double *values = (double *)malloc(rows * cols * sizeof(double));
+    double *colIds = (double *)malloc(rows * cols * sizeof(double));
+    double *rowPointer = (double *)malloc((rows + 1) * sizeof(double));
 
     size_t size = 0;
 
     // Row pointer
     rowPointer[0] = 0;
-    int counterIdx = 1;
     double counter = 0;
 
     // Iterating through array
@@ -40,10 +39,16 @@ CSRResult performCSR(double **A, size_t rows, size_t cols)
                 size++;
             };
         }
-        rowPointer[counterIdx] = counter;
-        counterIdx++;
+        rowPointer[i + 1] = counter;
     };
 
+    // Resize arrays to actual size
+    double *tempValues = realloc(values, size * sizeof(double));
+    double *tempColIds = realloc(colIds, size * sizeof(double));
+    values = tempValues;
+    colIds = tempColIds;
+
+    // Fill result
     CSRResult result = {size, values, colIds, rowPointer};
 
     return result;
@@ -76,8 +81,14 @@ int main()
     printVector(result.values, result.size, 0);
     printf("Vector colIds with size %zu.\n", result.size);
     printVector(result.colIds, result.size, 0);
-    printf("Vector rowPointer with size %zu.\n", result.size);
-    printVector(result.rowPointer, result.size, 0);
+    printf("Vector rowPointer with size %zu.\n", rows + 1);
+    printVector(result.rowPointer, rows + 1, 0);
+
+    // Free memory
+    freeMatrix(A, rows);
+    free(result.values);
+    free(result.colIds);
+    free(result.rowPointer);
 
     return 0;
 }
