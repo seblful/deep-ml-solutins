@@ -57,11 +57,34 @@ set_t createUniqueArray(double *y, size_t size)
     return (set_t){classes, setSize};
 }
 
+double *calculateProbs(double *y, size_t ySize, double *classes, size_t classesSize)
+{
+    double *probs = (double *)malloc(classesSize * sizeof(double));
+
+    for (int i = 0; i < classesSize; i++)
+    {
+        int count = 0;
+        for (int j = 0; j < ySize; j++)
+        {
+            if (classes[i] == y[j])
+            {
+                count += 1;
+            }
+        }
+        probs[i] = (double)count / (double)ySize;
+    }
+
+    return probs;
+}
+
 double giniImpurity(double *y, size_t size)
 {
     set_t classesSet = createUniqueArray(y, size);
     printf("SIZE CLASSES: %zu.\n", classesSet.size);
     printVector(classesSet.classes, classesSet.size, 3);
+
+    double *probs = calculateProbs(y, size, classesSet.classes, classesSet.size);
+    printVector(probs, classesSet.size, 3);
 }
 
 int main()
