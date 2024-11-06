@@ -1,12 +1,18 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <math.h>
 
 #include "utils.h"
 
 double *orthogonalProjection(double *v, double *L, size_t size)
 {
-    ;
+    double vL = vectorDotProduct(v, size, L, size);
+    double LL = vectorDotProduct(L, size, L, size);
+    double projScal = vL / LL;
+
+    double *result = (double *)malloc(size * sizeof(double));
+    scalarVectorMultiply(L, size, projScal, result);
+
+    return result;
 }
 
 int main()
@@ -31,7 +37,12 @@ int main()
 
     double *result = orthogonalProjection(v, L, size);
     printf("Vector result with size %d.\n", size);
-    printVector(result, size, 0);
+    printVector(result, size, 3);
+
+    // Free memory
+    free(v);
+    free(L);
+    free(result);
 
     return 0;
 }
