@@ -3,6 +3,12 @@
 
 #include "utils.h"
 
+typedef struct pivotResult
+{
+    double *data;
+    size_t size;
+} pivotResult;
+
 void rref(double **M, size_t rows, size_t cols)
 {
     size_t lead = 0;
@@ -55,6 +61,56 @@ void rref(double **M, size_t rows, size_t cols)
     }
 }
 
+pivotResult findPivotColumns(double **M, int rows, int cols)
+{
+    double *pivotCols = (double *)malloc(cols * sizeof(double));
+    size_t size = 0;
+
+    for (int j = 0; j < cols; j++)
+    {
+        for (int i = 0; i < rows; i++)
+        {
+            if (M[i][j] == 1)
+            { // Check for leading 1
+                // Ensure all other entries in this column are zero
+                int isPivotColumn = 1;
+                for (int k = 0; k < rows; k++)
+                {
+                    if (k != i && M[k][j] != 0)
+                    {
+                        isPivotColumn = 0;
+                        break;
+                    }
+                }
+                if (isPivotColumn)
+                {
+                    pivotCols[size] = j;
+                    size += 1;
+                    break; // Move to the next column
+                }
+            }
+        }
+    }
+
+    // Fill result
+    pivotResult result = {pivotCols, size};
+
+    return result;
+}
+
+double **matrixImage(double **M, size_t rows, size_t cols)
+{
+    // RREF
+    rref(M, rows, cols);
+    printf("Matrix RREF M with %zu rows and %zu cols.\n", rows, cols);
+    printMatrix(M, rows, cols, 0);
+
+    // Find pivot column
+    pivotResult pivots = findPivotColumns(M, rows, cols);
+    printf("Vector pivots with size %zu.\n", pivots.size);
+    printVector(pivots.data, pivots.size, 0);
+}
+
 int main()
 {
     // Init M
@@ -71,6 +127,11 @@ int main()
 
     printf("Matrix M with %zu rows and %zu cols.\n", rows, cols);
     printMatrix(M, rows, cols, 0);
+
+    // Matrix Image
+    matrixImage(M, rows, cols);
+
+    // Free memory
 
     return 0;
 }
