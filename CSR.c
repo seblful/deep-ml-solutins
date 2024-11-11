@@ -29,7 +29,7 @@ CSRResult performCSR(double **A, size_t rows, size_t cols)
     for (int i = 0; i < rows; i++)
     {
         double rowCounter = 0;
-        for (int j = 0; j < rows; j++)
+        for (int j = 0; j < cols; j++)
         {
             if (A[i][j] != 0)
             {
